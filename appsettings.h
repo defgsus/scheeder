@@ -18,37 +18,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef APPSETTINGS_H
+#define APPSETTINGS_H
 
-#include <QMainWindow>
+#include <QSettings>
 
-// forward declarations
-namespace Ui { class MainWindow; }
-class QDockWidget;
-class RenderWidget;
-class SourceWidget;
-
-class MainWindow : public QMainWindow
+class AppSettings : public QSettings
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit AppSettings(QObject *parent = 0);
+
+    /** Returns a map with default settings */
+    const QMap<QString, QVariant>& defaultValues() const
+    { return defaultValues_; }
+
+    /** Return a setting for a key.
+        If the key is not found in the settings,
+        defaultValues() will be queried.
+        If it's not found there an empty QVariant will be returned.
+        @note asserts in debug-mode for unknown keys!! */
+    QVariant getValue(const QString& key) const;
+
+signals:
+
+public slots:
 
 private:
-    /** Creates all the menu actions */
-    void createMainMenu_();
 
-    /** Returns a new dock-widget with default settings */
-    QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
+    void createDefaultValues_();
 
-
-    Ui::MainWindow * ui_;
-
-    RenderWidget * renderer_;
-    SourceWidget * editVert_, * editFrag_;
+    QMap<QString, QVariant> defaultValues_;
 };
 
-#endif // MAINWINDOW_H
+/** Single instance */
+extern AppSettings * appSettings;
+
+#endif // APPSETTINGS_H

@@ -19,11 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QDockWidget>
-#include <QTextEdit>
+#include <QMenu>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "renderwidget.h"
+#include "sourcewidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow     (parent),
@@ -32,33 +33,51 @@ MainWindow::MainWindow(QWidget *parent) :
     ui_->setupUi(this);
 
     // render window
+    renderer_ = new RenderWidget(this);
     auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));
-    renderer_ = new RenderWidget(dw);
     dw->setWidget(renderer_);
     addDockWidget(Qt::LeftDockWidgetArea, dw);
 
     // vertex source
+    editVert_ = new SourceWidget(this);
     dw = getDockWidget_("vertex_source", tr("vertex source"));
-    editVert_ = new QTextEdit(this);
     dw->setWidget(editVert_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
     // fragment source
+    editFrag_ = new SourceWidget(this);
     dw = getDockWidget_("fragment_source", tr("fragment source"));
-    editFrag_ = new QTextEdit(this);
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
+    createMainMenu_();
 }
 
 QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
 {
     auto dw = new QDockWidget(title, this);
+    // set an object name in case we want to store the view settings
     dw->setObjectName(obj_id);
+
+    // disable close feature
     dw->setFeatures(QDockWidget::DockWidgetMovable);
+    // make it large XXX seems to be ignored :(
     dw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     return dw;
 }
+
+void MainWindow::createMainMenu_()
+{
+    // --- file menu ---
+    QMenu * m = new QMenu(tr("&File"), this);
+    QAction * a = new QAction(tr("&Close"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(close()));
+
+    menuBar()->addMenu(m);
+}
+
 
 MainWindow::~MainWindow()
 {

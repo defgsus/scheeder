@@ -16,13 +16,17 @@ SOURCES += \
     main.cpp\
     mainwindow.cpp \
     renderwidget.cpp \
-    basic3dwidget.cpp
+    basic3dwidget.cpp \
+    sourcewidget.cpp \
+    appsettings.cpp
 
 HEADERS  += \
     mainwindow.h \
     renderwidget.h \
     basic3dwidget.h \
-    vector.h
+    vector.h \
+    sourcewidget.h \
+    appsettings.h
 
 FORMS    += \
     mainwindow.ui

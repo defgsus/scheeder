@@ -18,37 +18,48 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "appsettings.h"
 
-#include <QMainWindow>
+const QString default_vertex_source =
+        "void main()\n"
+        "{\n"
+        "   glFragCoord = ftransform();"
+        "}\n";
 
-// forward declarations
-namespace Ui { class MainWindow; }
-class QDockWidget;
-class RenderWidget;
-class SourceWidget;
+const QString default_fragment_source =
+        "void main()\n"
+        "{\n"
+        "   glFragColor = vec4(1.0, 0.7, 0.5, 1.0);"
+        "}\n";
 
-class MainWindow : public QMainWindow
+// the single instance
+AppSettings * appSettings;
+
+AppSettings::AppSettings(QObject *parent) :
+    QSettings(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private:
-    /** Creates all the menu actions */
-    void createMainMenu_();
-
-    /** Returns a new dock-widget with default settings */
-    QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
+    createDefaultValues_();
+}
 
 
-    Ui::MainWindow * ui_;
+void AppSettings::createDefaultValues_()
+{
+    defaultValues_.insert("vertex_source", default_vertex_source);
+    defaultValues_.insert("fragment_source", default_vertex_source);
 
-    RenderWidget * renderer_;
-    SourceWidget * editVert_, * editFrag_;
-};
+}
 
-#endif // MAINWINDOW_H
+
+
+QVariant AppSettings::getValue(const QString &key) const
+{
+    if (contains(key))
+        return value(key);
+
+    Q_ASSERT(defaultValues_.contains(key));
+
+    if (defaultValues_.contains(key))
+        return defaultValues_.value(key);
+
+    return QVariant();
+}

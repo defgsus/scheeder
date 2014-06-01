@@ -18,37 +18,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "sourcewidget.h"
 
-#include <QMainWindow>
-
-// forward declarations
-namespace Ui { class MainWindow; }
-class QDockWidget;
-class RenderWidget;
-class SourceWidget;
-
-class MainWindow : public QMainWindow
+SourceWidget::SourceWidget(QWidget *parent) :
+    QTextEdit(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private:
-    /** Creates all the menu actions */
-    void createMainMenu_();
-
-    /** Returns a new dock-widget with default settings */
-    QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
-
-
-    Ui::MainWindow * ui_;
-
-    RenderWidget * renderer_;
-    SourceWidget * editVert_, * editFrag_;
-};
-
-#endif // MAINWINDOW_H
+}

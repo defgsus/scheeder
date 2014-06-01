@@ -18,13 +18,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include "mainwindow.h"
 #include <QApplication>
+
+#include "mainwindow.h"
+#include "appsettings.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // create a single instance for application settings
+    appSettings = new AppSettings(&a);
+
     MainWindow w;
+
     w.show();
 
     return a.exec();
