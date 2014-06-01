@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "ui_mainwindow.h"
 #include "renderwidget.h"
 #include "sourcewidget.h"
+#include "appsettings.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow     (parent),
@@ -40,12 +41,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // vertex source
     editVert_ = new SourceWidget(this);
+    editVert_->setText(appSettings->getValue("vertex_source").toString());
     dw = getDockWidget_("vertex_source", tr("vertex source"));
     dw->setWidget(editVert_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
     // fragment source
     editFrag_ = new SourceWidget(this);
+    editFrag_->setText(appSettings->getValue("fragment_source").toString());
     dw = getDockWidget_("fragment_source", tr("fragment source"));
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);

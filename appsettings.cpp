@@ -23,20 +23,29 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 const QString default_vertex_source =
         "void main()\n"
         "{\n"
-        "   glFragCoord = ftransform();"
+        "   glFragCoord = ftransform();\n"
         "}\n";
 
 const QString default_fragment_source =
         "void main()\n"
         "{\n"
-        "   glFragColor = vec4(1.0, 0.7, 0.5, 1.0);"
+        "   glFragColor = vec4(1.0, 0.7, 0.5, 1.0);\n"
         "}\n";
 
 // the single instance
 AppSettings * appSettings;
 
 AppSettings::AppSettings(QObject *parent) :
-    QSettings(parent)
+    QSettings(
+        // we prefere ini-format for better control/removal
+        // (no headbanging with registry on windows)
+        QSettings::IniFormat,
+        // unique settings for each user
+        QSettings::UserScope,
+        // identifier
+        "modular-audio-graphics",
+        "scheeder",
+        parent)
 {
     createDefaultValues_();
 }
@@ -45,21 +54,25 @@ AppSettings::AppSettings(QObject *parent) :
 void AppSettings::createDefaultValues_()
 {
     defaultValues_.insert("vertex_source", default_vertex_source);
-    defaultValues_.insert("fragment_source", default_vertex_source);
-
+    defaultValues_.insert("fragment_source", default_fragment_source);
+    defaultValues_.insert("source_path", QString("./"));
 }
 
 
 
 QVariant AppSettings::getValue(const QString &key) const
 {
+    // return from saved settings
     if (contains(key))
         return value(key);
 
+    // check if in default settings
     Q_ASSERT(defaultValues_.contains(key));
 
+    // return from default settings
     if (defaultValues_.contains(key))
         return defaultValues_.value(key);
 
+    // NOT FOUND!
     return QVariant();
 }

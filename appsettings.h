@@ -23,6 +23,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QSettings>
 
+/** Extended QSettings suited for this application.
+
+    <p>It contains default settings for all things needed.
+    Read values like this:</p>
+    @code
+    QString path = appSettings->getValue("source_path").toString();
+    @endcode
+*/
 class AppSettings : public QSettings
 {
     Q_OBJECT
@@ -46,6 +54,7 @@ public slots:
 
 private:
 
+    /** Creates all default settings */
     void createDefaultValues_();
 
     QMap<QString, QVariant> defaultValues_;
