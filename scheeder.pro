@@ -4,17 +4,25 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = scheeder
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += --std=c++0x
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+QT       += core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets opengl
 
-HEADERS  += mainwindow.h
+SOURCES += \
+    main.cpp\
+    mainwindow.cpp \
+    renderwidget.cpp \
+    basic3dwidget.cpp
 
-FORMS    += mainwindow.ui
+HEADERS  += \
+    mainwindow.h \
+    renderwidget.h \
+    basic3dwidget.h \
+    vector.h
+
+FORMS    += \
+    mainwindow.ui

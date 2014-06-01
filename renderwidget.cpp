@@ -18,34 +18,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#include <QMainWindow>
+#include "renderwidget.h"
 
-// forward declarations
-namespace Ui { class MainWindow; }
-class QTextEdit;
-class QDockWidget;
-class RenderWidget;
-
-class MainWindow : public QMainWindow
+RenderWidget::RenderWidget(QWidget *parent) :
+    Basic3DWidget(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private:
-    /** Returns a new dock-widget with default settings */
-    QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumSize(256,256);
+}
 
 
-    Ui::MainWindow * ui_;
 
-    RenderWidget * renderer_;
-    QTextEdit * editVert_, * editFrag_;
-};
+void RenderWidget::paintGL()
+{
+    Basic3DWidget::paintGL();
 
-#endif // MAINWINDOW_H
+    drawCoords_(10);
+}

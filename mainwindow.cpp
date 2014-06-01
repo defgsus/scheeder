@@ -18,17 +18,49 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
+#include <QDockWidget>
+#include <QTextEdit>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "renderwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow     (parent),
+    ui_             (new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    ui_->setupUi(this);
+
+    // render window
+    auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));
+    renderer_ = new RenderWidget(dw);
+    dw->setWidget(renderer_);
+    addDockWidget(Qt::LeftDockWidgetArea, dw);
+
+    // vertex source
+    dw = getDockWidget_("vertex_source", tr("vertex source"));
+    editVert_ = new QTextEdit(this);
+    dw->setWidget(editVert_);
+    addDockWidget(Qt::RightDockWidgetArea, dw);
+
+    // fragment source
+    dw = getDockWidget_("fragment_source", tr("fragment source"));
+    editFrag_ = new QTextEdit(this);
+    dw->setWidget(editFrag_);
+    addDockWidget(Qt::RightDockWidgetArea, dw);
+
+}
+
+QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
+{
+    auto dw = new QDockWidget(title, this);
+    dw->setObjectName(obj_id);
+    dw->setFeatures(QDockWidget::DockWidgetMovable);
+    dw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    return dw;
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete ui_;
 }

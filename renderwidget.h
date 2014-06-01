@@ -18,34 +18,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef RENDERWIDGET_H
+#define RENDERWIDGET_H
 
-#include <QMainWindow>
+#include "basic3dwidget.h"
 
-// forward declarations
-namespace Ui { class MainWindow; }
-class QTextEdit;
-class QDockWidget;
-class RenderWidget;
-
-class MainWindow : public QMainWindow
+class RenderWidget : public Basic3DWidget
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit RenderWidget(QWidget *parent = 0);
 
-private:
-    /** Returns a new dock-widget with default settings */
-    QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
+signals:
 
+public slots:
 
-    Ui::MainWindow * ui_;
-
-    RenderWidget * renderer_;
-    QTextEdit * editVert_, * editFrag_;
+protected:
+    virtual void paintGL();
 };
 
-#endif // MAINWINDOW_H
+#endif // RENDERWIDGET_H
