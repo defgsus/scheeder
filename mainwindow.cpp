@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "renderwidget.h"
 #include "sourcewidget.h"
 #include "appsettings.h"
+#include "modelfactory.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow     (parent),
@@ -77,6 +78,19 @@ void MainWindow::createMainMenu_()
     QAction * a = new QAction(tr("&Close"), this);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(close()));
+
+    menuBar()->addMenu(m);
+
+    // --- model menu ---
+    m = new QMenu(tr("&Model"), this);
+    a = new QAction(tr("Create &Box"), this);
+    m->addAction(a);
+    connect(a, &QAction::triggered, [=]()
+    {
+        ModelFactory f;
+        Model * m = f.createCube(2);
+        renderer_->setModel(m);
+    });
 
     menuBar()->addMenu(m);
 }

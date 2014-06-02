@@ -18,44 +18,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#ifndef DEBUG_H
+#define DEBUG_H
 
-#include "renderwidget.h"
-#include "model.h"
+#include <iostream>
+#include <GL/gl.h>
 
-RenderWidget::RenderWidget(QWidget *parent) :
-    Basic3DWidget   (parent),
-    model_          (0)
-{
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(256,256);
+/** Returns the readable name for an opengl error */
+const char * glErrorName(GLenum error);
+
+
+#define SCH_CHECK_GL(command__)             \
+{                                           \
+    command__;                              \
+    if (GLenum err__ = glGetError())        \
+    {                                       \
+        std::cerr << "opengl error "        \
+            << glErrorName(err__)           \
+            << " for command "              \
+            << #command__                   \
+            << " in " << __FILE__           \
+            << ": " << __LINE__ << "\n";    \
+    }                                       \
 }
 
-RenderWidget::~RenderWidget()
-{
-    if (model_)
-        delete model_;
-}
-
-void RenderWidget::setModel(Model * m)
-{
-    if (model_)
-        delete model_;
-
-    model_ = m;
-
-    repaint();
-}
-
-void RenderWidget::paintGL()
-{
-    Basic3DWidget::paintGL();
-
-    drawCoords_(10);
-
-    if (model_)
-        model_->draw();
-}
-
-
+#endif // DEBUG_H

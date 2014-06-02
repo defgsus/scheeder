@@ -23,18 +23,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "basic3dwidget.h"
 
+// forward decls.
+class Model;
+
+/** Class to render a Model */
 class RenderWidget : public Basic3DWidget
 {
     Q_OBJECT
 public:
     explicit RenderWidget(QWidget *parent = 0);
+    ~RenderWidget();
 
 signals:
 
 public slots:
 
+    /** Sets the Model to be rendered.
+        Ownership of class is taken! */
+    void setModel(Model * m);
+
 protected:
     virtual void paintGL();
+
+private:
+    Model * model_;
 };
 
 #endif // RENDERWIDGET_H

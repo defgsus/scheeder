@@ -18,44 +18,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "debug.h"
 
-#include "renderwidget.h"
-#include "model.h"
 
-RenderWidget::RenderWidget(QWidget *parent) :
-    Basic3DWidget   (parent),
-    model_          (0)
+const char * glErrorName(GLenum error)
 {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(256,256);
+    switch (error)
+    {
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        case GL_STACK_UNDERFLOW: return "GL_STACK_UNDERFLOW";
+        case GL_STACK_OVERFLOW: return "GL_STACK_OVERFLOW";
+        //case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+        default: return "UNKNOWN_ERROR";
+    }
 }
-
-RenderWidget::~RenderWidget()
-{
-    if (model_)
-        delete model_;
-}
-
-void RenderWidget::setModel(Model * m)
-{
-    if (model_)
-        delete model_;
-
-    model_ = m;
-
-    repaint();
-}
-
-void RenderWidget::paintGL()
-{
-    Basic3DWidget::paintGL();
-
-    drawCoords_(10);
-
-    if (model_)
-        model_->draw();
-}
-
-

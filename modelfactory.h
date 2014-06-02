@@ -18,44 +18,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#ifndef MODELFACTORY_H
+#define MODELFACTORY_H
 
-#include "renderwidget.h"
-#include "model.h"
+// forwards
+class Model;
 
-RenderWidget::RenderWidget(QWidget *parent) :
-    Basic3DWidget   (parent),
-    model_          (0)
+/** @brief Creates predefined Shapes/Models
+*/
+class ModelFactory
 {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(256,256);
-}
+public:
+    ModelFactory();
 
-RenderWidget::~RenderWidget()
-{
-    if (model_)
-        delete model_;
-}
+    /** Create a cube model */
+    Model * createCube(float sidelength) const;
+};
 
-void RenderWidget::setModel(Model * m)
-{
-    if (model_)
-        delete model_;
-
-    model_ = m;
-
-    repaint();
-}
-
-void RenderWidget::paintGL()
-{
-    Basic3DWidget::paintGL();
-
-    drawCoords_(10);
-
-    if (model_)
-        model_->draw();
-}
-
-
+#endif // MODELFACTORY_H

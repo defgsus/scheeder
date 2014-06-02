@@ -18,7 +18,10 @@ SOURCES += \
     renderwidget.cpp \
     basic3dwidget.cpp \
     sourcewidget.cpp \
-    appsettings.cpp
+    appsettings.cpp \
+    model.cpp \
+    modelfactory.cpp \
+    debug.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -26,7 +29,10 @@ HEADERS  += \
     basic3dwidget.h \
     vector.h \
     sourcewidget.h \
-    appsettings.h
+    appsettings.h \
+    model.h \
+    modelfactory.h \
+    debug.h
 
 FORMS    += \
     mainwindow.ui
