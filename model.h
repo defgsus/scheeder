@@ -61,6 +61,7 @@ public:
 
     // -------- vertex/triangle handling -----
 
+    /** Clear ALL contents */
     void clear();
 
     int addVertex(VertexType x, VertexType y, VertexType z)
@@ -74,6 +75,8 @@ public:
 
     // ------- convenience functions -------
 
+    /** Automatically calculates all normals for each triangle.
+        Normals that share multiple triangles will be averaged. */
     void calculateTriangleNormals();
 
     /** Executes all drawing commands. */

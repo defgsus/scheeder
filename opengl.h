@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef OPENGL_H
 #define OPENGL_H
 
+// enable openGL extensions
 #define GL_GLEXT_PROTOTYPES
 
 #include <GL/gl.h>

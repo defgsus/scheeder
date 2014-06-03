@@ -36,6 +36,7 @@ public:
     explicit GlslHighlighter(QTextDocument * parent);
 
 protected:
+    /** Function called by QTextDocument */
     void highlightBlock(const QString &text);
 
 

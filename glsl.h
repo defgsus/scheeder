@@ -33,26 +33,37 @@ public:
 
     // ----------- query ---------------------
 
+    /** Return the log from the last compilation */
     const QString& log() const { return log_; }
+
+    /** Is the shader ready to use? */
+    bool ready() const { return ready_; }
 
     // ---------- source/compiler ------------
 
+    /** Sets the source for the vertex shader. Previous content will be overwritten. */
     void setVertexSource(const QString& text);
 
+    /** Sets the source for the fragment shader. Previous content will be overwritten. */
     void setFragmentSource(const QString& text);
 
+    /** Tries to compile the shader.
+        Any previous program will be destroyed.
+        @returns true on success, also sets ready() to true. */
     bool compile();
 
 private:
 
+    /** Compiles one of the vertex/fragment shaders and attaches to programObject */
     bool compileShader_(GLenum type, const QString& typeName, const QString& source);
 
     QString vertSource_,
             fragSource_,
-
             log_;
 
     GLenum shader_;
+
+    bool ready_;
 };
 
 #endif // GLSL_H

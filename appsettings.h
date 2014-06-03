@@ -48,8 +48,12 @@ public:
         @note asserts in debug-mode for unknown keys!! */
     QVariant getValue(const QString& key) const;
 
+    /** Stores a layout of a widget */
     void setLayout(QWidget *);
+
+    /** Tries to restore a layout of a widget */
     void getLayout(QWidget *);
+
 signals:
 
 public slots:

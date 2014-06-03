@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "debug.h"
 
 Glsl::Glsl()
+    :   shader_ (-1),
+        ready_  (false)
 {
 }
 
@@ -41,6 +43,7 @@ bool Glsl::compile()
 {
     // delete previous shader object
     SCH_CHECK_GL( if (glIsProgram(shader_)) glDeleteProgram(shader_) );
+    ready_ = false;
 
     log_ = "";
 
@@ -74,7 +77,7 @@ bool Glsl::compile()
         return false;
     }
 
-    return true;
+    return ready_ = true;
 }
 
 

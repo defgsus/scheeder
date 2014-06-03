@@ -39,14 +39,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
-
-    void compileShader();
-
 protected:
 
     void closeEvent(QCloseEvent * );
 
+private slots:
+
+    void compileShader();
 
 private:
     /** Creates all the menu actions */
@@ -55,7 +54,10 @@ private:
     /** Returns a new dock-widget with default settings */
     QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
 
+    /** Stores the whole window geometry + dockwidgets.
+        @note All Widgets to be saved need a unique ObjectName! */
     void saveWidgetsGeometry_();
+    /** Tries to restore the whole window geometry + dockwidgets. */
     void restoreWidgetsGeometry_();
 
     // -------------- private member ---------------------

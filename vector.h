@@ -17,6 +17,14 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
+/** @file
+
+    @brief definition of vector and matrix types.
+
+    <p>This file includes the glm library and all usefull functions from it
+    and defines the common types of vectors and matrices.</p>
+*/
+
 
 #ifndef VECTOR_H
 #define VECTOR_H
