@@ -22,7 +22,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define VECTOR_H
 
 #include <iostream>
+
+/* http://glm.g-truc.net */
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/core/func_geometric.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 // --------- our floating-point numeric type --------
 

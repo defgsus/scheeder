@@ -18,29 +18,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef GLSL_H
+#define GLSL_H
 
-#include <iostream>
+#include <QString>
+
 #include "opengl.h"
+#include "vector.h"
 
-/** Returns the readable name for an opengl error */
-const char * glErrorName(GLenum error);
+class Glsl
+{
+public:
+    Glsl();
 
-/** Executes the command and calls glGetError() and
-    prints the error, if any. */
-#define SCH_CHECK_GL(command__)             \
-{                                           \
-    command__;                              \
-    if (GLenum err__ = glGetError())        \
-    {                                       \
-        std::cerr << "opengl error "        \
-            << glErrorName(err__)           \
-            << " for command "              \
-            << #command__                   \
-            << " in " << __FILE__           \
-            << ": " << __LINE__ << "\n";    \
-    }                                       \
-}
+    // ---------- source/compiler ------------
 
-#endif // DEBUG_H
+    void setVertexSource(const QString& text);
+
+    void setFragmentSource(const QString& text);
+
+    bool compile();
+
+private:
+
+    bool compileShader_(GLenum type, const QString& typeName, const QString& source);
+
+    QString vertSource_,
+            fragSource_,
+
+            log_;
+
+    GLenum shader_;
+};
+
+#endif // GLSL_H

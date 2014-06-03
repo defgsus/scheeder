@@ -21,7 +21,8 @@ SOURCES += \
     appsettings.cpp \
     model.cpp \
     modelfactory.cpp \
-    debug.cpp
+    debug.cpp \
+    glsl.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -32,7 +33,9 @@ HEADERS  += \
     appsettings.h \
     model.h \
     modelfactory.h \
-    debug.h
+    debug.h \
+    glsl.h \
+    opengl.h
 
 FORMS    += \
     mainwindow.ui

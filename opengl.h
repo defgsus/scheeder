@@ -18,29 +18,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef OPENGL_H
+#define OPENGL_H
 
-#include <iostream>
-#include "opengl.h"
+#define GL_GLEXT_PROTOTYPES
 
-/** Returns the readable name for an opengl error */
-const char * glErrorName(GLenum error);
+#include <GL/gl.h>
+#include <GL/glext.h>
 
-/** Executes the command and calls glGetError() and
-    prints the error, if any. */
-#define SCH_CHECK_GL(command__)             \
-{                                           \
-    command__;                              \
-    if (GLenum err__ = glGetError())        \
-    {                                       \
-        std::cerr << "opengl error "        \
-            << glErrorName(err__)           \
-            << " for command "              \
-            << #command__                   \
-            << " in " << __FILE__           \
-            << ": " << __LINE__ << "\n";    \
-    }                                       \
-}
-
-#endif // DEBUG_H
+#endif // OPENGL_H

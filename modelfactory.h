@@ -33,6 +33,10 @@ public:
 
     /** Create a cube model */
     Model * createCube(float sidelength) const;
+
+    /** Create a box model */
+    Model * createBox(float sidelength_x, float sidelength_y, float sidelength_z) const;
+
 };
 
 #endif // MODELFACTORY_H

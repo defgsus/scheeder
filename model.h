@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define MODEL_H
 
 #include <vector>
-#include <GL/gl.h>
+
+#include "opengl.h"
 
 /** Abstraction around GL-arrays.
 
@@ -58,7 +59,7 @@ public:
     /** Returns number of triangles in the Model */
     int numTriangles() const { return index_.size() / 3; }
 
-    // -------- handling -----
+    // -------- vertex/triangle handling -----
 
     void clear();
 
@@ -70,6 +71,10 @@ public:
                   ColorType r, ColorType g, ColorType b, ColorType a);
 
     void addTriangle(IndexType p1, IndexType p2, IndexType p3);
+
+    // ------- convenience functions -------
+
+    void calculateTriangleNormals();
 
     /** Executes all drawing commands. */
     void draw() const;

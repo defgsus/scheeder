@@ -25,29 +25,37 @@ ModelFactory::ModelFactory()
 {
 }
 
+Model * ModelFactory::createCube(float s) const
+{
+    return createBox(s, s, s);
+}
 
-Model * ModelFactory::createCube(float sidelength) const
+Model * ModelFactory::createBox(
+        float sidelength_x, float sidelength_y, float sidelength_z) const
 {
     Model * m = new Model;
 
-    float s = sidelength * 0.5f;
+    float
+        sx = sidelength_x * 0.5f,
+        sy = sidelength_y * 0.5f,
+        sz = sidelength_z * 0.5f;
 
     // --- vertices / corner-points ---
 
     // front-bottom-left
-    int fbl = m->addVertex(-s, -s,  s),
+    int fbl = m->addVertex(-sx, -sy,  sz),
     // front-bottom-right
-        fbr = m->addVertex( s, -s,  s),
+        fbr = m->addVertex( sx, -sy,  sz),
     // front-top-right
-        ftr = m->addVertex( s,  s,  s),
+        ftr = m->addVertex( sx,  sy,  sz),
     // front-top-left
-        ftl = m->addVertex(-s,  s,  s),
+        ftl = m->addVertex(-sx,  sy,  sz),
     // back-bottom-left
-        bbl = m->addVertex(-s, -s, -s),
+        bbl = m->addVertex(-sx, -sy, -sz),
     // aso..
-        bbr = m->addVertex( s, -s, -s),
-        btr = m->addVertex( s,  s, -s),
-        btl = m->addVertex(-s,  s, -s);
+        bbr = m->addVertex( sx, -sy, -sz),
+        btr = m->addVertex( sx,  sy, -sz),
+        btl = m->addVertex(-sx,  sy, -sz);
 
     // --- surfaces / triangles ---
 
@@ -70,6 +78,7 @@ Model * ModelFactory::createCube(float sidelength) const
     m->addTriangle(fbr, fbl, bbl);
     m->addTriangle(fbr, bbr, bbl);
 
+    m->calculateTriangleNormals();
 
     return m;
 }
