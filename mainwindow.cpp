@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QDockWidget>
 #include <QMenu>
+#include <QTextBrowser>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -27,10 +28,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "sourcewidget.h"
 #include "appsettings.h"
 #include "modelfactory.h"
+#include "glsl.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow     (parent),
-    ui_             (new Ui::MainWindow)
+    ui_             (new Ui::MainWindow),
+    shader_         (new Glsl)
 {
     ui_->setupUi(this);
 
@@ -54,7 +57,19 @@ MainWindow::MainWindow(QWidget *parent) :
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
+    // log view
+    log_ = new QTextBrowser(this);
+    dw = getDockWidget_("log_view", tr("log"));
+    dw->setWidget(log_);
+    addDockWidget(Qt::LeftDockWidgetArea, dw);
+
     createMainMenu_();
+}
+
+MainWindow::~MainWindow()
+{
+    delete shader_;
+    delete ui_;
 }
 
 QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
@@ -93,10 +108,23 @@ void MainWindow::createMainMenu_()
     });
 
     menuBar()->addMenu(m);
+
+    // --- shader menu ---
+    m = new QMenu(tr("&Shader"), this);
+    a = new QAction(tr("&Compile"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(compileShader()));
+
+    menuBar()->addMenu(m);
+
 }
 
 
-MainWindow::~MainWindow()
+void MainWindow::compileShader()
 {
-    delete ui_;
+    shader_->setVertexSource(editVert_->toPlainText());
+    shader_->setFragmentSource(editFrag_->toPlainText());
+
+    shader_->compile();
+    log_->setText(shader_->log());
 }

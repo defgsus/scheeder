@@ -50,7 +50,7 @@ bool Glsl::compile()
     // test if working
     if (!glIsProgram(shader_))
     {
-        log_ += "could not create ProgramObject";
+        log_ += "could not create ProgramObject\n";
         return false;
     }
 
@@ -69,7 +69,7 @@ bool Glsl::compile()
     SCH_CHECK_GL( glGetProgramiv(shader_, GL_LINK_STATUS, &linked) );
     if (!linked)
     {
-        log_ += "shader programm link error";
+        log_ += "shader programm link error\n";
         shader_ = -1;
         return false;
     }
@@ -84,7 +84,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     SCH_CHECK_GL( shadername = glCreateShaderObjectARB(type) );
     if (!glIsShader(shadername))
     {
-        log_ += "error creating " + typeName + " ShaderObject";
+        log_ += "error creating " + typeName + " ShaderObject\n";
         return false;
     }
 
@@ -102,11 +102,12 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     SCH_CHECK_GL( glGetShaderiv(shadername, GL_COMPILE_STATUS, &cc); )
     if (!cc)
     {
-        log_ += typeName + " compile ERROR";
+        log_ += typeName + " compile ERROR\n";
         //MO_CHECK_GL( glGetShaderiv(shadername, GL_SHADER_SOURCE_LENGTH, &cc); )
+        return false;
     }
     else
-        log_ += typeName + " compiled..";
+        log_ += typeName + " compiled..\n";
 
     // print compiler log
     GLint blen = 0;
@@ -116,7 +117,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     {
         std::vector<GLchar> compiler_log(blen+1);
         SCH_CHECK_GL( glGetInfoLogARB(shadername, blen, &slen, &compiler_log[0]) );
-        log_ += "compiler log:\n" + QString(&compiler_log[0]);
+        log_ += "compiler log:\n" + QString(&compiler_log[0]) + "\n";
         // error_line_(compiler_log, code));
     }
 

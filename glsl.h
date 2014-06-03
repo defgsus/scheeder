@@ -31,6 +31,10 @@ class Glsl
 public:
     Glsl();
 
+    // ----------- query ---------------------
+
+    const QString& log() const { return log_; }
+
     // ---------- source/compiler ------------
 
     void setVertexSource(const QString& text);

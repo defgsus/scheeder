@@ -26,8 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // forward declarations
 namespace Ui { class MainWindow; }
 class QDockWidget;
+class QTextBrowser;
 class RenderWidget;
 class SourceWidget;
+class Glsl;
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +39,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+    void compileShader();
+
 private:
     /** Creates all the menu actions */
     void createMainMenu_();
@@ -45,10 +51,16 @@ private:
     QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
 
 
+    // -------------- private member ---------------------
+
     Ui::MainWindow * ui_;
 
     RenderWidget * renderer_;
     SourceWidget * editVert_, * editFrag_;
+
+    QTextBrowser * log_;
+
+    Glsl * shader_;
 };
 
 #endif // MAINWINDOW_H
