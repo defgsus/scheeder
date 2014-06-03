@@ -18,28 +18,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef SOURCEWIDGET_H
-#define SOURCEWIDGET_H
+#ifndef GLSLHIGHLIGHTER_H
+#define GLSLHIGHLIGHTER_H
 
-#include <QTextEdit>
+#include <QSyntaxHighlighter>
+#include <QTextDocument>
+#include <QTextCharFormat>
 
-class QSyntaxHighlighter;
 
-class SourceWidget : public QTextEdit
+/** @brief Syntax highlighter for GLSL
+    @note hacked together from Qt Example
+*/
+class GlslHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
-    explicit SourceWidget(QWidget *parent = 0);
+    explicit GlslHighlighter(QTextDocument * parent);
 
-    ~SourceWidget();
+protected:
+    void highlightBlock(const QString &text);
 
-signals:
-
-public slots:
 
 private:
 
-    QSyntaxHighlighter * highlighter_;
+    struct HighlightingRule
+    {
+        QRegExp pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> rules_;
+
+    QTextCharFormat commentFormat_;
+
+    QRegExp commentStartExpression_;
+    QRegExp commentEndExpression_;
 };
 
-#endif // SOURCEWIDGET_H
+
+#endif // GLSLHIGHLIGHTER_H

@@ -98,16 +98,19 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     SCH_CHECK_GL( glCompileShaderARB(shadername) );
 
     // check compile status
+    bool compiled = false;
     GLint cc;
     SCH_CHECK_GL( glGetShaderiv(shadername, GL_COMPILE_STATUS, &cc); )
     if (!cc)
     {
         log_ += typeName + " compile ERROR\n";
         //MO_CHECK_GL( glGetShaderiv(shadername, GL_SHADER_SOURCE_LENGTH, &cc); )
-        return false;
     }
     else
+    {
         log_ += typeName + " compiled..\n";
+        compiled = true;
+    }
 
     // print compiler log
     GLint blen = 0;
@@ -124,5 +127,5 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     // attach to programObject
     SCH_CHECK_GL( glAttachObjectARB(shader_, shadername) );
 
-    return true;
+    return compiled;
 }

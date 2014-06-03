@@ -22,7 +22,8 @@ SOURCES += \
     model.cpp \
     modelfactory.cpp \
     debug.cpp \
-    glsl.cpp
+    glsl.cpp \
+    glslhighlighter.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -35,7 +36,8 @@ HEADERS  += \
     modelfactory.h \
     debug.h \
     glsl.h \
-    opengl.h
+    opengl.h \
+    glslhighlighter.h
 
 FORMS    += \
     mainwindow.ui

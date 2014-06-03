@@ -19,8 +19,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "sourcewidget.h"
+#include "glslhighlighter.h"
 
 SourceWidget::SourceWidget(QWidget *parent) :
     QTextEdit(parent)
 {
+    // set default colors
+
+    QPalette pal = palette();
+
+    pal.setColor(QPalette::Base, QColor(61,61,61));
+    pal.setColor(QPalette::Text, QColor(200,200,200));
+
+    setPalette(pal);
+
+    // attach syntax highlighter
+    highlighter_ = new GlslHighlighter(document());
+}
+
+SourceWidget::~SourceWidget()
+{
+    delete highlighter_;
 }
