@@ -43,6 +43,11 @@ private slots:
 
     void compileShader();
 
+protected:
+
+    void closeEvent(QCloseEvent * );
+
+
 private:
     /** Creates all the menu actions */
     void createMainMenu_();
@@ -50,6 +55,8 @@ private:
     /** Returns a new dock-widget with default settings */
     QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);
 
+    void saveWidgetsGeometry_();
+    void restoreWidgetsGeometry_();
 
     // -------------- private member ---------------------
 

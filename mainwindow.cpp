@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QDockWidget>
 #include <QMenu>
 #include <QTextBrowser>
+#include <QCloseEvent>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -35,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui_             (new Ui::MainWindow),
     shader_         (new Glsl)
 {
+    setObjectName("MainWindow");
+
     ui_->setupUi(this);
 
     // render window
@@ -64,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::LeftDockWidgetArea, dw);
 
     createMainMenu_();
+
+    restoreWidgetsGeometry_();
 }
 
 MainWindow::~MainWindow()
@@ -118,6 +123,40 @@ void MainWindow::createMainMenu_()
     menuBar()->addMenu(m);
 
 }
+
+void MainWindow::saveWidgetsGeometry_()
+{
+    appSettings->beginGroup("Geometry");
+    appSettings->setLayout(this);
+    appSettings->setValue("windowState", saveState());
+    appSettings->endGroup();
+}
+
+void MainWindow::restoreWidgetsGeometry_()
+{
+    appSettings->beginGroup("Geometry");
+    appSettings->getLayout(this);
+    if (appSettings->contains("windowState"))
+        restoreState(appSettings->getValue("windowState").toByteArray());
+    appSettings->endGroup();
+}
+
+
+// ---------------- ACTION / EXECUTION -------------------------
+
+
+void MainWindow::closeEvent(QCloseEvent * e)
+{
+    // store the source texts
+    appSettings->setValue("vertex_source", editVert_->toPlainText());
+    appSettings->setValue("fragment_source", editFrag_->toPlainText());
+
+    saveWidgetsGeometry_();
+
+    e->accept();
+}
+
+
 
 
 void MainWindow::compileShader()

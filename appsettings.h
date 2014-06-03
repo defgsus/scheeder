@@ -48,6 +48,8 @@ public:
         @note asserts in debug-mode for unknown keys!! */
     QVariant getValue(const QString& key) const;
 
+    void setLayout(QWidget *);
+    void getLayout(QWidget *);
 signals:
 
 public slots:

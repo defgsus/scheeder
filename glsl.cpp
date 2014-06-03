@@ -59,7 +59,7 @@ bool Glsl::compile()
         return false;
 
     // compile the fragment shader
-    if (!compileShader_(GL_FRAGMENT_SHADER_ARB, "fragment shader", vertSource_))
+    if (!compileShader_(GL_FRAGMENT_SHADER_ARB, "fragment shader", fragSource_))
         return false;
 
     // link program object

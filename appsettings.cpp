@@ -18,6 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
+#include <QWidget>
+
 #include "appsettings.h"
 
 const QString default_vertex_source =
@@ -75,4 +77,24 @@ QVariant AppSettings::getValue(const QString &key) const
 
     // NOT FOUND!
     return QVariant();
+}
+
+void AppSettings::setLayout(QWidget * w)
+{
+    if (!w || w->objectName().isEmpty())
+        return;
+
+    setValue(w->objectName(), w->saveGeometry());
+}
+
+void AppSettings::getLayout(QWidget * w)
+{
+    if (!w || w->objectName().isEmpty())
+        return;
+
+    if (!contains(w->objectName()))
+        return;
+
+    QByteArray a = getValue(w->objectName()).toByteArray();
+    w->restoreGeometry(a);
 }

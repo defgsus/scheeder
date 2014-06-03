@@ -20,6 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "glslhighlighter.h"
 
+/* Following are the keywords and variable names of GLSL.
+ * TODO: Would be great to divide them into different GLSL versions.
+ *       Right now, they are all from 1.2 to 4+
+ */
+
 /* http://www.opengl.org/registry/doc/GLSLangSpec.4.10.6.clean.pdf */
 const QString glsl_keywords[] =
 {
@@ -96,7 +101,8 @@ const QString glsl_variables[] =
     "gl_Layer", "gl_ViewportIndex",
     "gl_FragCoord", "gl_FrontFacing", "gl_PointCoord",
     "gl_SampleID", "gl_SamplePosition", "gl_SampleMask", "gl_SampleMaskIn",
-    "gl_DepthRange", "gl_FragDepth"
+    "gl_DepthRange",
+    "gl_FragColor", "gl_FragData", "gl_FragDepth"
 };
 const int num_glsl_variables = sizeof(glsl_variables) / sizeof(glsl_variables[0]);
 
@@ -122,11 +128,13 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
     variableFormat.setFontWeight(QFont::Bold);
     variableFormat.setForeground(QBrush(QColor(200,220,200)));
     // comments
-    commentFormat_.setForeground(QBrush(QColor(120,120,120)));
+    commentFormat_.setForeground(QBrush(QColor(140,140,140)));
 
+    // temporary
     HighlightingRule rule;
 
     // setup keywords
+
     for (int i=0; i<num_glsl_keywords; ++i)
     {
         // match whole-word with word boundaries
@@ -149,17 +157,17 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
 
     for (int i=0; i<num_glsl_variables; ++i)
     {
-        rule.pattern = QRegExp( glsl_variables[i] );
-        rule.pattern.setPatternSyntax(QRegExp::FixedString);
+        rule.pattern = QRegExp( "\\b" + glsl_variables[i] + "\\b" );
         rule.format = variableFormat;
         rules_.append(rule);
     }
 
-    // single line comments
+    // setup single line comments
     rule.pattern = QRegExp("//[^\n]*");
     rule.format = commentFormat_;
     rules_.append(rule);
-    // multiline comments
+
+    // setup multiline comments
     commentStartExpression_ = QRegExp("/\\*");
     commentEndExpression_ = QRegExp("\\*/");
 }
@@ -183,7 +191,9 @@ void GlslHighlighter::highlightBlock(const QString &text)
         }
     }
 
-    // multiline comments
+
+    // --- multiline comments ---
+
     setCurrentBlockState(0);
 
     int startIndex = 0;
