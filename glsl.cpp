@@ -59,7 +59,9 @@ bool Glsl::compile()
 
     // compile the vertex shader
     if (!compileShader_(GL_VERTEX_SHADER_ARB, "vertex shader", vertSource_))
+    {
         return false;
+    }
 
     // compile the fragment shader
     if (!compileShader_(GL_FRAGMENT_SHADER_ARB, "fragment shader", fragSource_))
@@ -83,6 +85,9 @@ bool Glsl::compile()
 
 bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &source)
 {
+    if (source.isEmpty())
+        return false;
+
     int shadername;
     SCH_CHECK_GL( shadername = glCreateShaderObjectARB(type) );
     if (!glIsShader(shadername))
@@ -92,11 +97,17 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     }
 
     // get the latin1 char source
-    const GLchar * src[1];
-    src[0] = source.toStdString().c_str();
+    // NOTE: QString::toStdString() is a temporary, we can't just
+    // take the pointer to it because the pointet-at memory might
+    // have been deallocated already.
+    // Below is the totally safe way.
+    std::vector<GLchar> src(source.size()+1);
+    memcpy(&src[0], source.toStdString().c_str(), source.size());
+    const GLchar * psrc[1];
+    psrc[0] = &src[0];
 
     // attach source
-    SCH_CHECK_GL( glShaderSource(shadername, 1, src, 0) );
+    SCH_CHECK_GL( glShaderSource(shadername, 1, psrc, 0) );
     // compile
     SCH_CHECK_GL( glCompileShaderARB(shadername) );
 
@@ -131,4 +142,18 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     SCH_CHECK_GL( glAttachObjectARB(shader_, shadername) );
 
     return compiled;
+}
+
+
+void Glsl::activate()
+{
+    if (!ready())
+        return;
+
+    SCH_CHECK_GL( glUseProgramObjectARB(shader_) );
+}
+
+void Glsl::deactivate()
+{
+    SCH_CHECK_GL( glUseProgramObjectARB(0) );
 }

@@ -42,6 +42,9 @@ Model * ModelFactory::createBox(
 
     // --- vertices / corner-points ---
 
+
+    m->setColor(0.1,1.0,0.5, 1.);
+
     // front-bottom-left
     int fbl = m->addVertex(-sx, -sy,  sz),
     // front-bottom-right
@@ -49,9 +52,12 @@ Model * ModelFactory::createBox(
     // front-top-right
         ftr = m->addVertex( sx,  sy,  sz),
     // front-top-left
-        ftl = m->addVertex(-sx,  sy,  sz),
+        ftl = m->addVertex(-sx,  sy,  sz);
+
+    m->setColor(1,0.5,0.1, 1.);
+
     // back-bottom-left
-        bbl = m->addVertex(-sx, -sy, -sz),
+    int bbl = m->addVertex(-sx, -sy, -sz),
     // aso..
         bbr = m->addVertex( sx, -sy, -sz),
         btr = m->addVertex( sx,  sy, -sz),
@@ -66,8 +72,8 @@ Model * ModelFactory::createBox(
     m->addTriangle(ftr, fbr, btr);
     m->addTriangle(fbr, bbr, btr);
     // back
-    m->addTriangle(btr, btl, bbl);
-    m->addTriangle(btr, bbl, bbr);
+    m->addTriangle(btr, bbr, btl);
+    m->addTriangle(btl, bbr, bbl);
     // left
     m->addTriangle(ftl, btl, bbl);
     m->addTriangle(ftl, bbl, fbl);
@@ -76,7 +82,7 @@ Model * ModelFactory::createBox(
     m->addTriangle(ftr, btl, ftl);
     // bottom
     m->addTriangle(fbr, fbl, bbl);
-    m->addTriangle(fbr, bbr, bbl);
+    m->addTriangle(fbr, bbl, bbr);
 
     m->calculateTriangleNormals();
 

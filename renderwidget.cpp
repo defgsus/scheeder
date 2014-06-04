@@ -23,10 +23,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "renderwidget.h"
 #include "model.h"
+#include "glsl.h"
+#include "debug.h"
+
 
 RenderWidget::RenderWidget(QWidget *parent) :
     Basic3DWidget   (parent),
-    model_          (0)
+    model_          (0),
+    shader_         (0)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(256,256);
@@ -36,6 +40,8 @@ RenderWidget::~RenderWidget()
 {
     if (model_)
         delete model_;
+    if (shader_)
+        delete shader_;
 }
 
 void RenderWidget::setModel(Model * m)
@@ -45,7 +51,25 @@ void RenderWidget::setModel(Model * m)
 
     model_ = m;
 
-    repaint();
+    update();
+}
+
+void RenderWidget::setShader(Glsl *s)
+{
+    if (shader_)
+        delete shader_;
+
+    shader_ = s;
+
+    update();
+}
+
+void RenderWidget::initializeGL()
+{
+    Basic3DWidget::initializeGL();
+
+    SCH_CHECK_GL( glEnable(GL_DEPTH_TEST) );
+    SCH_CHECK_GL( glEnable(GL_CULL_FACE) );
 }
 
 void RenderWidget::paintGL()
@@ -54,8 +78,14 @@ void RenderWidget::paintGL()
 
     drawCoords_(10);
 
+    if (shader_)
+        shader_->activate();
+
     if (model_)
         model_->draw();
+
+    if (shader_)
+        shader_->deactivate();
 }
 
 

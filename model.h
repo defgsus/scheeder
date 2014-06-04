@@ -59,13 +59,20 @@ public:
     /** Returns number of triangles in the Model */
     int numTriangles() const { return index_.size() / 3; }
 
+    // --------- state -----------------------
+
+    /** Sets the current color. Any subsequent call to addVertex will
+        use this color. */
+    void setColor(ColorType r, ColorType g, ColorType b, ColorType a)
+    { curR_ = r; curG_ = g; curB_ = b; curA_ = a; }
+
     // -------- vertex/triangle handling -----
 
     /** Clear ALL contents */
     void clear();
 
     int addVertex(VertexType x, VertexType y, VertexType z)
-    { return addVertex(x,y,z, 0,0,0, 1,1,1,1); }
+    { return addVertex(x,y,z, 0,0,0, curR_, curG_, curB_, curA_); }
 
     int addVertex(VertexType x, VertexType y, VertexType z,
                   NormalType nx, NormalType ny, NormalType nz,
@@ -90,6 +97,8 @@ private:
     std::vector<TextureCoordType> texcoord_;
     std::vector<IndexType>        index_;
 
+    ColorType
+        curR_, curG_, curB_, curA_;
 };
 
 #endif // MODEL_H

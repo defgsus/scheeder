@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // forward decls.
 class Model;
+class Glsl;
 
 /** Class to render a Model */
 class RenderWidget : public Basic3DWidget
@@ -42,11 +43,18 @@ public slots:
         Ownership of class is taken! */
     void setModel(Model * m);
 
+    /** Sets the Shader to be used for rendering.
+        Ownership of class is taken! */
+    void setShader(Glsl * s);
+
 protected:
+    virtual void initializeGL();
+
     virtual void paintGL();
 
 private:
     Model * model_;
+    Glsl * shader_;
 };
 
 #endif // RENDERWIDGET_H

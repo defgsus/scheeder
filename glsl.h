@@ -52,6 +52,12 @@ public:
         @returns true on success, also sets ready() to true. */
     bool compile();
 
+    // ------------ usage --------------------
+
+    void activate();
+
+    void deactivate();
+
 private:
 
     /** Compiles one of the vertex/fragment shaders and attaches to programObject */

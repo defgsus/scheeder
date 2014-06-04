@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // render window
     renderer_ = new RenderWidget(this);
+    renderer_->setShader(shader_);
     auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));
     dw->setWidget(renderer_);
     addDockWidget(Qt::LeftDockWidgetArea, dw);
@@ -73,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete shader_;
     delete ui_;
 }
 
@@ -166,4 +166,6 @@ void MainWindow::compileShader()
 
     shader_->compile();
     log_->setText(shader_->log());
+
+    renderer_->update();
 }

@@ -68,7 +68,7 @@ protected:
     void mousePressEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
 
-    //void initializeGL();
+    //virtual void initializeGL();
 
     /** Sets the viewport and the projection matrix */
     virtual void resizeGL(int w, int h);
