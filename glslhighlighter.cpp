@@ -87,6 +87,52 @@ const QString glsl_reserved_keywords[] =
 const int num_glsl_reserved_keywords =
         sizeof(glsl_reserved_keywords) / sizeof(glsl_reserved_keywords[0]);
 
+const QString glsl_functions[] =
+{
+    "radians", "degrees", "sin", "cos", "tan", "asin", "acos", "atan",
+    "sinh", "cosh", "tanh", "asinh", "acosh", "atanh",
+    "pow", "exp", "log", "exp2", "log2", "sqrt", "inversesqrt",
+    "abs", "sign", "floor", "trunc", "round", "roundEven", "ceil", "fract", "mod",
+    "modf", "min", "max", "clamp", "mix", "step", "smoothstep", "isnan", "isinf",
+    "floatBitsToInt", "floatBitsToUint", "intBitsToFloat", "uintBitsToFloat",
+    "fma", "frexp", "ldexp",
+    "packUnorm2x16", "packUnorm4x8", "packSnorm4x8",
+    "unpackUnorm2x16", "unpackUnorm4x8", "unpackSnorm4x8",
+    "packDouble2x32", "unpackDouble2x32",
+    "length", "distance", "dot", "cross", "normalize", "ftransform",
+    "faceforward", "reflect", "refract",
+    "matrixCompMult", "outerProduct", "transpose", "determinant", "inverse",
+    "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
+    "equal", "notEqual", "any", "all", "not",
+    "uaddCarry", "usubBorrow", "umulExtended", "imulExtended",
+    "bitfieldExtract", "bitfieldInsert", "bitfieldReverse", "bitCount", "findLSB", "findMSB",
+    "textureSize", "textureQueryLod", "textureQueryLevels",
+    "texture", "textureProj", "textureLod",
+    "textureOffset", "texelFetch", "texelFetchOffset", "textureProjOffset", "textureLodOffset",
+    "textureProjLod", "textureProjLodOffset", "textureGrad", "textureGradOffset",
+    "textureProjGrad", "textureProjGradOffset",
+    "textureGather", "textureGatherOffset", "textureGatherOffsets",
+    "texture1D", "texture1DProj", "texture1DLod", "texture1DProjLod",
+    "texture2D", "texture2DProj", "texture2DLod", "texture2DProjLod",
+    "texture3D", "texture3DProj", "texture3DLod", "texture3DProjLod",
+    "textureCube", "textureCubeLod",
+    "shadow1D", "shadow1DProj", "shadow1DLod", "shadow1DProjLod",
+    "shadow2D", "shadow2DProj", "shadow2DLod", "shadow2DProjLod",
+    "atomicCounterIncrement", "atomicCounterDecrement", "atomicCounter",
+    "atomicAdd", "atomicMin", "atomicMax", "atomicAnd", "atomicOr", "atomicXor",
+    "atomicExchange", "atomicCompSwap",
+    "imageSize", "imageLoad", "imageStore",
+    "imageAtomicAdd", "imageAtomicMin", "imageAtomicMax", "imageAtomicAnd", "imageAtomicOr", "imageAtomicXor",
+    "dFdx", "dFdy", "fwidth",
+    "interpolateAtCentroid", "interpolateAtSample", "interpolateAtOffset",
+    "noise1", "noise2", "noise3", "noise4",
+    "EmitStreamVertex", "EndStreamPrimitive", "EmitVertex", "EndPrimitive",
+    "barrier", "memoryBarrier", "memoryBarrierAtomicCounter", "memoryBarrierBuffer",
+    "memoryBarrierShared", "memoryBarrier", "memoryBarrierImage", "groupMemoryBarrier"
+};
+const int num_glsl_functions =
+        sizeof(glsl_functions) / sizeof(glsl_functions[0]);
+
 /* https://www.opengl.org/wiki/Built-in_Variable_%28GLSL%29 */
 const QString glsl_variables[] =
 {
@@ -102,7 +148,32 @@ const QString glsl_variables[] =
     "gl_FragCoord", "gl_FrontFacing", "gl_PointCoord",
     "gl_SampleID", "gl_SamplePosition", "gl_SampleMask", "gl_SampleMaskIn",
     "gl_DepthRange",
-    "gl_FragColor", "gl_FragData", "gl_FragDepth"
+    "gl_FragColor", "gl_FragData", "gl_FragDepth",
+    "gl_Normal", "gl_Color", "gl_SecondaryColor",
+    "gl_NormalScale", "gl_ClipPlane",
+    "gl_PointParamaters", "gl_MaterialParameters", "gl_LightSourceParameters",
+    "gl_LightModelParameters", "gl_LightModelProducts", "gl_LightProducts",
+    "gl_FogParameters",
+    "gl_FogCoord",
+    "gl_FrontColor", "gl_BackColor", "gl_FrontSecondaryColor", "gl_BackSecondaryColor",
+    "gl_TexCoord", "gl_FogFragCoord",
+    "gl_ModelViewMatrix", "gl_ProjectionMatrix", "gl_ModelViewProjectionMatrix",
+    "gl_TextureMatrix", "gl_NormalMatrix",
+    "gl_ModelViewMatrixInverse", "gl_ProjectionMatrixInverse",
+    "gl_ModelViewProjectionMatrixInverse", "gl_TextureMatrixInverse"
+    "gl_ModelViewMatrixTranspose", "gl_ProjectionMatrixTranspose",
+    "gl_ModelViewProjectionMatrixTranspose", "gl_TextureMatrixTranspose"
+    "gl_ModelViewMatrixInverseTranspose", "gl_ProjectionMatrixInverseTranspose",
+    "gl_ModelViewProjectionMatrixInverseTranspose", "gl_TextureMatrixInverseTranspose"
+    "gl_MultiTexCoord0", "gl_MultiTexCoord1", "gl_MultiTexCoord2", "gl_MultiTexCoord3",
+    "gl_MultiTexCoord4", "gl_MultiTexCoord5", "gl_MultiTexCoord6", "gl_MultiTexCoord7",
+    // constants
+    "gl_MaxTextureUnits", "gl_MaxVertexAttribs", "gl_MaxVertexUniformComponents",
+    "gl_MaxVaryingFloats", "gl_MaxVaryingComponents", "gl_MaxVertextTextureImageUnits",
+    "gl_MaxCombinedTextureImageUnits", "gl_MaxTextureImageUnits", "gl_MaxFragmentUniformComponents",
+    "gl_MaxDrawBuffers", "gl_MaxClipDistances",
+    "gl_MaxClipPlanes", "gl_MaxTextureCoords",
+
 };
 const int num_glsl_variables = sizeof(glsl_variables) / sizeof(glsl_variables[0]);
 
@@ -114,6 +185,7 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
     QTextCharFormat
         keywordFormat,
         reservedKeywordFormat,
+        functionFormat,
         variableFormat;
 
     // -- styles for each category --
@@ -124,6 +196,9 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
     // reserved keywords
     reservedKeywordFormat.setFontWeight(QFont::Bold);
     reservedKeywordFormat.setForeground(QBrush(QColor(220,50,50)));
+    // built-in functions
+    functionFormat.setFontWeight(QFont::Bold);
+    functionFormat.setForeground(QBrush(QColor(200,200,220)));
     // built-in variables
     variableFormat.setFontWeight(QFont::Bold);
     variableFormat.setForeground(QBrush(QColor(200,220,200)));
@@ -147,9 +222,17 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
 
     for (int i=0; i<num_glsl_reserved_keywords; ++i)
     {
-        // match whole-word with word boundaries
         rule.pattern = QRegExp( "\\b" + glsl_reserved_keywords[i] + "\\b" );
         rule.format = reservedKeywordFormat;
+        rules_.append(rule);
+    }
+
+    // setup functions
+
+    for (int i=0; i<num_glsl_functions; ++i)
+    {
+        rule.pattern = QRegExp( "\\b" + glsl_functions[i] + "\\b" );
+        rule.format = functionFormat;
         rules_.append(rule);
     }
 
