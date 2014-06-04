@@ -7,6 +7,7 @@ This project is supposed to be easily understandable in terms of programming and
 
 It also shows some Qt stuff like:
 - MainWindow actions
+- use of QSettings
 - dynamic widget creation
 - use of C++11 lambdas in signal-slot connections
 
