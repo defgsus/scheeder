@@ -60,6 +60,8 @@ public:
 
 private:
 
+    void getUniforms_();
+
     /** Compiles one of the vertex/fragment shaders and attaches to programObject */
     bool compileShader_(GLenum type, const QString& typeName, const QString& source);
 

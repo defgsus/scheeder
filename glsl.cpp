@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
+#include <QDebug>
 #include "glsl.h"
 #include "debug.h"
 
@@ -78,6 +79,8 @@ bool Glsl::compile()
         shader_ = -1;
         return false;
     }
+
+    getUniforms_();
 
     return ready_ = true;
 }
@@ -156,4 +159,23 @@ void Glsl::activate()
 void Glsl::deactivate()
 {
     SCH_CHECK_GL( glUseProgramObjectARB(0) );
+}
+
+void Glsl::getUniforms_()
+{
+    GLint numu;
+    SCH_CHECK_GL( glGetProgramiv(shader_, GL_ACTIVE_UNIFORMS, &numu) );
+    qDebug() << numu << " uniforms:";
+
+    for (int i=0; i<numu; ++i)
+    {
+        GLsizei length;
+        GLint size;
+        GLenum type;
+        std::vector<GLchar> name(1024);
+        SCH_CHECK_GL( glGetActiveUniform(shader_, i, name.size(), &length, &size, &type, &name[0]) );
+        name.resize(length);
+        QString uname(&name[0]);
+        qDebug() << uname << " " << size << " " << type;
+    }
 }
