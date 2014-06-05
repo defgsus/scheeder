@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef GLSL_H
 #define GLSL_H
 
-#include <memory> // for std::auto_ptr
+#include <memory> // for std::shared_ptr
 
 #include <QString>
 
@@ -47,7 +47,7 @@ struct Uniform
     GLint location() const { return location_; }
 
     friend class Glsl;
-    friend class std::auto_ptr<Uniform>;
+    friend void privateUniformDeleter(Uniform*);
 
     // ----------- private area -----------
 private:
@@ -56,6 +56,8 @@ private:
     Uniform();
     /** Private destructor to avoid stupid things. */
     ~Uniform() { }
+
+    void copyValuesFrom_(Uniform*);
 
     QString name_;
     GLenum type_;
@@ -105,7 +107,7 @@ public:
     void setFragmentSource(const QString& text);
 
     /** Tries to compile the shader.
-        Any previous program will be destroyed.
+        Any previous program will be destroyed but the values of uniforms are kept.
         @returns true on success, also sets ready() to true. */
     bool compile();
 
@@ -144,7 +146,9 @@ private:
     bool ready_;
     bool activated_;
 
-    std::vector<std::auto_ptr<Uniform>> uniforms_;
+    std::vector<std::shared_ptr<Uniform>>
+        uniforms_,
+        oldUniforms_;
 };
 
 #endif // GLSL_H

@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "glsl.h"
 #include "debug.h"
 
+void privateUniformDeleter(Uniform * u) { delete u; }
+
+
 Uniform::Uniform()
     :   type_    (0),
         size_    (0),
@@ -30,6 +33,13 @@ Uniform::Uniform()
     floats[0] = floats[1] = floats[2] = floats[3] = 0.f;
 }
 
+void Uniform::copyValuesFrom_(Uniform * u)
+{
+    floats[0] = u->floats[0];
+    floats[1] = u->floats[1];
+    floats[2] = u->floats[2];
+    floats[3] = u->floats[3];
+}
 
 Glsl::Glsl()
     :   shader_     (-1),
@@ -52,6 +62,9 @@ void Glsl::setFragmentSource(const QString &text)
 
 bool Glsl::compile()
 {
+    // keep copy of previous uniforms
+    oldUniforms_ = uniforms_;
+
     // init state
     ready_ = false;
     log_ = "";
@@ -178,28 +191,40 @@ void Glsl::deactivate()
 
 void Glsl::getUniforms_()
 {
-    uniforms_.clear();
-
     // get number of used uniforms
     GLint numu;
     SCH_CHECK_GL( glGetProgramiv(shader_, GL_ACTIVE_UNIFORMS, &numu) );
+
+    // get max length of variable names
+    GLint labelLength;
+    SCH_CHECK_GL( glGetIntegerv(GL_MAX_LABEL_LENGTH, &labelLength) );
 
     // get each uniform data
     for (int i=0; i<numu; ++i)
     {
         Uniform * u = new Uniform;
 
+        u->location_ = i;
+
+        // plain old char* strings always need a bit of extra lines ..
         GLsizei length;
-        std::vector<GLchar> name(1024);
+        std::vector<GLchar> name(labelLength);
         SCH_CHECK_GL(
             glGetActiveUniform(shader_, i, name.size(), &length, &u->size_, &u->type_, &name[0])
             );
         name.resize(length);
         u->name_ = QString(&name[0]);
-        u->location_ = i;
 
         // keep in list
-        uniforms_.push_back(std::auto_ptr<Uniform>(u));
+        uniforms_.push_back(std::shared_ptr<Uniform>(u, privateUniformDeleter));
+
+        // see if we have values from previous uniforms
+        for (auto j = oldUniforms_.begin(); j!=oldUniforms_.end(); ++j)
+        if (j->get()->name_ == u->name_ && j->get()->type_ == u->type_)
+        {
+            u->copyValuesFrom_(j->get());
+            break;
+        }
     }
 }
 

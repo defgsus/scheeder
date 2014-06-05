@@ -28,16 +28,28 @@ class QWidget;
 class QDoubleSpinBox;
 class Uniform;
 
+
+/** This class creates widgets for controlling uniforms.
+ */
 class UniformWidgetFactory : public QObject
 {
     Q_OBJECT
 public:
     explicit UniformWidgetFactory(QObject * parent);
 
+    /** Creates a widget for the given uniform.
+        The returned widget will be a child of @p parent and
+        will contain a number of sub-widgets in a sub-layout,
+        depending on the uniform type.
+        Editing the widgets will directly change the contents of
+        the passed Uniform struct and also issue a uniformChanged() signal.
+        @note The returned widget's lifetime must not exceed the
+        lifetime of the uniform! This would probably lead to segfaults. */
     QWidget * getWidget(Uniform * uniform, QWidget * parent);
 
 signals:
 
+    /** This signal is send whenever the Uniform is changed by an edit action. */
     void uniformChanged(Uniform *);
 
 private:

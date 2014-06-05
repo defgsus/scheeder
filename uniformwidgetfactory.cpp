@@ -58,12 +58,14 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
                     QDoubleSpinBox * sb;
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
                 }
+                break;
                 case GL_FLOAT_VEC2:
                 {
                     QDoubleSpinBox * sb;
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
                 }
+                break;
                 case GL_FLOAT_VEC3:
                 {
                     QDoubleSpinBox * sb;
@@ -71,6 +73,7 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 2) );
                 }
+                break;
                 case GL_FLOAT_VEC4:
                 {
                     QDoubleSpinBox * sb;
@@ -79,6 +82,7 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 2) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 3) );
                 }
+                break;
             }
 
     return w;
@@ -91,10 +95,12 @@ QDoubleSpinBox * UniformWidgetFactory::getFloatWidget_(
     auto w = new QDoubleSpinBox(parent);
     w->setRange(-100000000., 100000000.);
 
+    w->setValue(uniform->floats[vecIndex]);
+
     /*  This shows how to connect to actual functions rather than Qt slots,
         which is possible since Qt 5.
         We further use a C++11 lambda instead of a function because it makes
-        life much more easier here. This way, each spinbox widget connects
+        life a bit easier here. This way, each spinbox widget connects
         to a unique (anonymous) function which changes the one Uniform struct
         assigned to the widet. Without lambdas, the way would be to attach
         the Uniform to the userData of the widget and write a generic slot.
