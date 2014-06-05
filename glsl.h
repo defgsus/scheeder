@@ -29,6 +29,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 class Glsl
 {
 public:
+
+    // -------------- types ------------------
+
+    /** Container for a GLSL uniform. */
+    struct Uniform
+    {
+        /** Name as in the shader */
+        QString name;
+        /** Type of the uniform */
+        GLenum type;
+        /** Number of instances (for arrays) */
+        GLint size;
+        /** Uniform location, to send the stuff over */
+        GLint location;
+    };
+
+    // ---------------- ctor -----------------
+
     Glsl();
 
     // ----------- query ---------------------
@@ -38,6 +56,10 @@ public:
 
     /** Is the shader ready to use? */
     bool ready() const { return ready_; }
+
+    /** Returns list of uniforms attached to this shader.
+        Can be called after succesful compilation */
+    const std::vector<Uniform>& uniforms() { return uniforms_; }
 
     // ---------- source/compiler ------------
 
@@ -72,6 +94,8 @@ private:
     GLenum shader_;
 
     bool ready_;
+
+    std::vector<Uniform> uniforms_;
 };
 
 #endif // GLSL_H

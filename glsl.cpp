@@ -42,11 +42,13 @@ void Glsl::setFragmentSource(const QString &text)
 
 bool Glsl::compile()
 {
+    // init state
+    ready_ = false;
+    log_ = "";
+    uniforms_.clear();
+
     // delete previous shader object
     SCH_CHECK_GL( if (glIsProgram(shader_)) glDeleteProgram(shader_) );
-    ready_ = false;
-
-    log_ = "";
 
     // create shader object
     SCH_CHECK_GL( shader_ = glCreateProgramObjectARB() );
@@ -103,7 +105,8 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     // NOTE: QString::toStdString() is a temporary, we can't just
     // take the pointer to it because the pointet-at memory might
     // have been deallocated already.
-    // Below is the totally safe way.
+    // This is the totally safe way.
+    // (unless the driver tries a buffer overflow attack :)
     std::vector<GLchar> src(source.size()+1);
     memcpy(&src[0], source.toStdString().c_str(), source.size());
     const GLchar * psrc[1];
@@ -163,19 +166,25 @@ void Glsl::deactivate()
 
 void Glsl::getUniforms_()
 {
+    uniforms_.clear();
+
+    // get number of used uniforms
     GLint numu;
     SCH_CHECK_GL( glGetProgramiv(shader_, GL_ACTIVE_UNIFORMS, &numu) );
-    qDebug() << numu << " uniforms:";
 
+    // get each uniform data
     for (int i=0; i<numu; ++i)
     {
+        Uniform u;
+
         GLsizei length;
-        GLint size;
-        GLenum type;
         std::vector<GLchar> name(1024);
-        SCH_CHECK_GL( glGetActiveUniform(shader_, i, name.size(), &length, &size, &type, &name[0]) );
+        SCH_CHECK_GL(
+            glGetActiveUniform(shader_, i, name.size(), &length, &u.size, &u.type, &name[0]) );
         name.resize(length);
-        QString uname(&name[0]);
-        qDebug() << uname << " " << size << " " << type;
+        u.name = QString(&name[0]);
+
+        // keep in list
+        uniforms_.push_back(u);
     }
 }
