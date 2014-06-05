@@ -22,6 +22,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "glsl.h"
 #include "debug.h"
 
+Uniform::Uniform()
+    :   type    (0),
+        size    (0),
+        location(0)
+{
+    floats[0] = floats[1] = floats[2] = floats[3] = 0.f;
+}
+
+
 Glsl::Glsl()
     :   shader_ (-1),
         ready_  (false)
@@ -175,16 +184,29 @@ void Glsl::getUniforms_()
     // get each uniform data
     for (int i=0; i<numu; ++i)
     {
-        Uniform u;
+        Uniform * u = new Uniform;
 
         GLsizei length;
         std::vector<GLchar> name(1024);
         SCH_CHECK_GL(
-            glGetActiveUniform(shader_, i, name.size(), &length, &u.size, &u.type, &name[0]) );
+            glGetActiveUniform(shader_, i, name.size(), &length, &u->size, &u->type, &name[0])
+            );
         name.resize(length);
-        u.name = QString(&name[0]);
+        u->name = QString(&name[0]);
 
         // keep in list
-        uniforms_.push_back(u);
+        uniforms_.push_back(std::auto_ptr<Uniform>(u));
+    }
+}
+
+void Glsl::setUniform(const Uniform * u)
+{
+    switch (u->type)
+    {
+    case GL_FLOAT_VEC3:
+        SCH_CHECK_GL( glUniform3f(u->location, u->floats[0], u->floats[1], u->floats[2]) );
+    break;
+    default:
+        qDebug() << "unsupported uniform type" << u->type;
     }
 }

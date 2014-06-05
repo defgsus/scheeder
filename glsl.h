@@ -21,29 +21,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef GLSL_H
 #define GLSL_H
 
+#include <memory> // for std::auto_ptr
+
 #include <QString>
 
 #include "opengl.h"
-#include "vector.h"
+
+/** Container for a GLSL uniform. */
+struct Uniform
+{
+    /** Name as in the shader */
+    QString name;
+    /** Type of the uniform */
+    GLenum type;
+    /** Number of instances (for arrays) */
+    GLint size;
+    /** Uniform location, to send the stuff over */
+    GLint location;
+
+    GLfloat floats[4];
+
+    /** Constructor (clears all contents) */
+    Uniform();
+};
+
 
 class Glsl
 {
 public:
-
-    // -------------- types ------------------
-
-    /** Container for a GLSL uniform. */
-    struct Uniform
-    {
-        /** Name as in the shader */
-        QString name;
-        /** Type of the uniform */
-        GLenum type;
-        /** Number of instances (for arrays) */
-        GLint size;
-        /** Uniform location, to send the stuff over */
-        GLint location;
-    };
 
     // ---------------- ctor -----------------
 
@@ -57,9 +62,14 @@ public:
     /** Is the shader ready to use? */
     bool ready() const { return ready_; }
 
-    /** Returns list of uniforms attached to this shader.
-        Can be called after succesful compilation */
-    const std::vector<Uniform>& uniforms() { return uniforms_; }
+    /** Returns the number of used uniforms of this shader.
+        Can be called after succesful compilation. */
+    size_t numUniforms() const { return uniforms_.size(); }
+
+    /** Returns a pointer to a uniform attached to this shader.
+        Can be called after succesful compilation.
+        @p index must be < numUniforms() */
+    Uniform * getUniform(size_t index) { return uniforms_[index].get(); }
 
     // ---------- source/compiler ------------
 
@@ -76,9 +86,17 @@ public:
 
     // ------------ usage --------------------
 
+    /** Activates the shader. Subsequent OpenGL calls will
+        be affected by the shader's workings. */
     void activate();
 
+    /** Turns the shader off. */
     void deactivate();
+
+    /** Sets the GPU-value of the uniform to the contents provided by
+        the @p uniform parameter.
+        @note The shader must be activated. */
+    void setUniform(const Uniform * uniform);
 
 private:
 
@@ -95,7 +113,7 @@ private:
 
     bool ready_;
 
-    std::vector<Uniform> uniforms_;
+    std::vector<std::auto_ptr<Uniform>> uniforms_;
 };
 
 #endif // GLSL_H

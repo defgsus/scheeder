@@ -30,6 +30,8 @@ class QTextBrowser;
 class RenderWidget;
 class SourceWidget;
 class Glsl;
+class Uniform;
+class UniformWidgetFactory;
 
 class MainWindow : public QMainWindow
 {
@@ -47,6 +49,8 @@ private slots:
 
     void compileShader();
 
+    void slotUniformChanged(Uniform *);
+
 private:
     /** Creates all the menu actions */
     void createMainMenu_();
@@ -60,12 +64,18 @@ private:
     /** Tries to restore the whole window geometry + dockwidgets. */
     void restoreWidgetsGeometry_();
 
+    void updateUniformWidgets_();
+    void deleteUniformWidgets_();
+
     // -------------- private member ---------------------
 
     Ui::MainWindow * ui_;
 
     RenderWidget * renderer_;
     SourceWidget * editVert_, * editFrag_;
+
+    QWidget * uniEdit_;
+    UniformWidgetFactory * uniFactory_;
 
     QTextBrowser * log_;
 

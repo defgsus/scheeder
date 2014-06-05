@@ -17,11 +17,12 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-
+#include <QDebug>
 #include <QDockWidget>
 #include <QMenu>
 #include <QTextBrowser>
 #include <QCloseEvent>
+#include <QLayout>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -30,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "appsettings.h"
 #include "modelfactory.h"
 #include "glsl.h"
+#include "uniformwidgetfactory.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow     (parent),
@@ -67,6 +69,19 @@ MainWindow::MainWindow(QWidget *parent) :
     dw->setWidget(log_);
     addDockWidget(Qt::LeftDockWidgetArea, dw);
 
+    // uniform edit space
+    uniEdit_ = new QWidget(this);
+    auto l = new QVBoxLayout(uniEdit_);
+    l->setMargin(1);
+    dw = getDockWidget_("uni_edit", tr("shader uniforms"));
+    dw->setWidget(uniEdit_);
+    addDockWidget(Qt::BottomDockWidgetArea, dw);
+
+    // uniform factory/controller
+    uniFactory_ = new UniformWidgetFactory(this);
+    connect(uniFactory_, SIGNAL(uniformChanged(Glsl::Uniform*)),
+                    this, SLOT(slotUniformChanged(Glsl::Uniform*)));
+
     createMainMenu_();
 
     restoreWidgetsGeometry_();
@@ -80,7 +95,7 @@ MainWindow::~MainWindow()
 QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
 {
     auto dw = new QDockWidget(title, this);
-    // set an object name in case we want to store the view settings
+    // set an object name because we want to store the layout settings
     dw->setObjectName(obj_id);
 
     // disable close feature
@@ -124,6 +139,10 @@ void MainWindow::createMainMenu_()
 
 }
 
+
+
+// ---------------- ACTION / EXECUTION -------------------------
+
 void MainWindow::saveWidgetsGeometry_()
 {
     appSettings->beginGroup("Geometry");
@@ -142,9 +161,6 @@ void MainWindow::restoreWidgetsGeometry_()
 }
 
 
-// ---------------- ACTION / EXECUTION -------------------------
-
-
 void MainWindow::closeEvent(QCloseEvent * e)
 {
     // store the source texts
@@ -157,6 +173,43 @@ void MainWindow::closeEvent(QCloseEvent * e)
 }
 
 
+void MainWindow::updateUniformWidgets_()
+{
+    // delete the previous uniform widgets
+    deleteUniformWidgets_();
+
+    if (shader_->numUniforms() <= 0)
+        return;
+
+    // create the uniform widgets
+
+    for (size_t i=0; i<shader_->numUniforms(); ++i)
+    {
+        // get the uniform struct
+        Uniform * u = shader_->getUniform(i);
+        // create a widget for the uniform
+        QWidget * w = uniFactory_->getWidget(u, uniEdit_);
+        // add to layout
+        uniEdit_->layout()->addWidget(w);
+    }
+
+    // add a 'stretch' at the bottom to push the widgets together
+    // NOTE: base class QLayout unfortunately does not have addStretch()
+    // but we know it's a QVBoxLayout
+    auto l = qobject_cast<QVBoxLayout*>(uniEdit_->layout());
+    if (l) l->addStretch(2);
+}
+
+void MainWindow::deleteUniformWidgets_()
+{
+    QObjectList childs = uniEdit_->children();
+    for (auto i = childs.begin(); i!=childs.end(); ++i)
+    if (QWidget * w = qobject_cast<QWidget*>(*i))
+    {
+        w->deleteLater();
+    }
+}
+
 
 
 void MainWindow::compileShader()
@@ -167,5 +220,12 @@ void MainWindow::compileShader()
     shader_->compile();
     log_->setText(shader_->log());
 
+    updateUniformWidgets_();
+
     renderer_->update();
+}
+
+void MainWindow::slotUniformChanged(Uniform * u)
+{
+    qDebug() << "changed uniform" << u->name << u->floats[0] << u->floats[1] << u->floats[2];
 }
