@@ -37,6 +37,9 @@ class UniformWidgetFactory : public QObject
 public:
     explicit UniformWidgetFactory(QObject * parent);
 
+    /** Returns true if a widget can be created for the uniform type. */
+    bool isSupported(unsigned int type) const;
+
     /** Creates a widget for the given uniform.
         The returned widget will be a child of @p parent and
         will contain a number of sub-widgets in a sub-layout,

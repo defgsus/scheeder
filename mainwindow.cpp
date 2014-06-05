@@ -185,6 +185,9 @@ void MainWindow::updateUniformWidgets_()
     {
         // get the uniform struct
         Uniform * u = shader_->getUniform(i);
+        // see if a widget can be created
+        if (!uniFactory_->isSupported(u->type()))
+            continue;
         // create a widget for the uniform
         QWidget * w = uniFactory_->getWidget(u, uniEdit_);
         // add to layout
@@ -200,11 +203,17 @@ void MainWindow::updateUniformWidgets_()
 
 void MainWindow::deleteUniformWidgets_()
 {
+    // delete layout items
+    QLayoutItem *child;
+    while ((child = uniEdit_->layout()->takeAt(0)) != 0)
+        delete child;
+
+    // delete widgets
     QObjectList childs = uniEdit_->children();
     for (auto i = childs.begin(); i!=childs.end(); ++i)
-    if (QWidget * w = qobject_cast<QWidget*>(*i))
     {
-        w->deleteLater();
+        if (QWidget * w = qobject_cast<QWidget*>(*i))
+            w->deleteLater();
     }
 }
 

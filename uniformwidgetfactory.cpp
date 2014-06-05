@@ -31,6 +31,13 @@ UniformWidgetFactory::UniformWidgetFactory(QObject * parent)
 {
 }
 
+bool UniformWidgetFactory::isSupported(GLenum type) const
+{
+    return type == GL_FLOAT
+        || type == GL_FLOAT_VEC2
+        || type == GL_FLOAT_VEC3
+        || type == GL_FLOAT_VEC4;
+}
 
 QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
 {
