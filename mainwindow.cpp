@@ -79,8 +79,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // uniform factory/controller
     uniFactory_ = new UniformWidgetFactory(this);
-    connect(uniFactory_, SIGNAL(uniformChanged(Glsl::Uniform*)),
-                    this, SLOT(slotUniformChanged(Glsl::Uniform*)));
 
     createMainMenu_();
 
@@ -214,6 +212,10 @@ void MainWindow::deleteUniformWidgets_()
 
 void MainWindow::compileShader()
 {
+    // disconnect uniform updates
+    disconnect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
+                    this, SLOT(slotUniformChanged(Uniform*)));
+
     shader_->setVertexSource(editVert_->toPlainText());
     shader_->setFragmentSource(editFrag_->toPlainText());
 
@@ -222,10 +224,18 @@ void MainWindow::compileShader()
 
     updateUniformWidgets_();
 
+    // connct uniform updates
+    if (shader_->ready())
+    {
+        connect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
+                        this, SLOT(slotUniformChanged(Uniform*)));
+    }
+
     renderer_->update();
 }
 
 void MainWindow::slotUniformChanged(Uniform * u)
 {
-    qDebug() << "changed uniform" << u->name << u->floats[0] << u->floats[1] << u->floats[2];
+    qDebug() << "changed uniform" << u->name() << u->floats[0] << u->floats[1] << u->floats[2];
+    renderer_->update();
 }

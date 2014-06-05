@@ -23,17 +23,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "debug.h"
 
 Uniform::Uniform()
-    :   type    (0),
-        size    (0),
-        location(0)
+    :   type_    (0),
+        size_    (0),
+        location_(0)
 {
     floats[0] = floats[1] = floats[2] = floats[3] = 0.f;
 }
 
 
 Glsl::Glsl()
-    :   shader_ (-1),
-        ready_  (false)
+    :   shader_     (-1),
+        ready_      (false),
+        activated_  (false)
 {
 }
 
@@ -166,11 +167,13 @@ void Glsl::activate()
         return;
 
     SCH_CHECK_GL( glUseProgramObjectARB(shader_) );
+    activated_ = true;
 }
 
 void Glsl::deactivate()
 {
     SCH_CHECK_GL( glUseProgramObjectARB(0) );
+    activated_ = false;
 }
 
 void Glsl::getUniforms_()
@@ -189,24 +192,40 @@ void Glsl::getUniforms_()
         GLsizei length;
         std::vector<GLchar> name(1024);
         SCH_CHECK_GL(
-            glGetActiveUniform(shader_, i, name.size(), &length, &u->size, &u->type, &name[0])
+            glGetActiveUniform(shader_, i, name.size(), &length, &u->size_, &u->type_, &name[0])
             );
         name.resize(length);
-        u->name = QString(&name[0]);
+        u->name_ = QString(&name[0]);
+        u->location_ = i;
 
         // keep in list
         uniforms_.push_back(std::auto_ptr<Uniform>(u));
     }
 }
 
-void Glsl::setUniform(const Uniform * u)
+void Glsl::sendUniform(const Uniform * u)
 {
-    switch (u->type)
+    switch (u->type())
     {
-    case GL_FLOAT_VEC3:
-        SCH_CHECK_GL( glUniform3f(u->location, u->floats[0], u->floats[1], u->floats[2]) );
+    case GL_FLOAT:
+        SCH_CHECK_GL( glUniform1f(u->location_, u->floats[0]) );
     break;
-    default:
-        qDebug() << "unsupported uniform type" << u->type;
+    case GL_FLOAT_VEC2:
+        SCH_CHECK_GL( glUniform2f(u->location_, u->floats[0], u->floats[1]) );
+    break;
+    case GL_FLOAT_VEC3:
+        SCH_CHECK_GL( glUniform3f(u->location_, u->floats[0], u->floats[1], u->floats[2]) );
+    break;
+    case GL_FLOAT_VEC4:
+        SCH_CHECK_GL( glUniform4f(u->location_, u->floats[0], u->floats[1], u->floats[2], u->floats[3]) );
+    break;
+//    default:
+//        qDebug() << "unsupported uniform type" << u->type_;
     }
+}
+
+void Glsl::sendUniforms()
+{
+    for (size_t i=0; i<numUniforms(); ++i)
+        sendUniform(getUniform(i));
 }

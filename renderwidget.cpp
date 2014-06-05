@@ -79,7 +79,10 @@ void RenderWidget::paintGL()
     drawCoords_(10);
 
     if (shader_)
+    {
         shader_->activate();
+        shader_->sendUniforms();
+    }
 
     if (model_)
         model_->draw();

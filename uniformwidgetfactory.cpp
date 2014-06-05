@@ -44,21 +44,40 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
     lv->setMargin(1);
 
         // name label
-        QLabel * l = new QLabel(uniform->name, w);
+        QLabel * l = new QLabel(uniform->name(), w);
         lv->addWidget(l);
 
         // controls
         QHBoxLayout * lh = new QHBoxLayout;
         lv->addLayout(lh);
 
-            switch(uniform->type)
+            switch(uniform->type())
             {
+                case GL_FLOAT:
+                {
+                    QDoubleSpinBox * sb;
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
+                }
+                case GL_FLOAT_VEC2:
+                {
+                    QDoubleSpinBox * sb;
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
+                }
                 case GL_FLOAT_VEC3:
                 {
                     QDoubleSpinBox * sb;
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 2) );
+                }
+                case GL_FLOAT_VEC4:
+                {
+                    QDoubleSpinBox * sb;
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 0) );
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 2) );
+                    lh->addWidget( sb = getFloatWidget_(uniform, w, 3) );
                 }
             }
 
@@ -68,17 +87,39 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
 QDoubleSpinBox * UniformWidgetFactory::getFloatWidget_(
         Uniform * uniform, QWidget *parent, int vecIndex)
 {
+    // prepare a nice spinbox
     auto w = new QDoubleSpinBox(parent);
     w->setRange(-100000000., 100000000.);
 
+    /*  This shows how to connect to actual functions rather than Qt slots,
+        which is possible since Qt 5.
+        We further use a C++11 lambda instead of a function because it makes
+        life much more easier here. This way, each spinbox widget connects
+        to a unique (anonymous) function which changes the one Uniform struct
+        assigned to the widet. Without lambdas, the way would be to attach
+        the Uniform to the userData of the widget and write a generic slot.
+
+        One slight caveat of connecting to functions instead of slots is that
+        we can't use the SIGNAL() macro anymore. So the signal has to be the
+        actual function too. In the case of the QDoubleSpinBox this is expressed
+        as: &QDoubleSpinBox::valueChanged
+        BUT there are actually two overloaded versions of valueChanged(), one
+        with a double parameter and one with a QString. The C++ parser needs to
+        know which one to use and this is only possible with this rather
+        complicated looking static_cast below.
+        It's, however, not needed for functions that are not overloaded.
+    */
     connect(w,
-        static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+        static_cast<void(QDoubleSpinBox::*)(double)>( &QDoubleSpinBox::valueChanged ),
         [=](double value)
         {
             uniform->floats[vecIndex] = value;
             uniformChanged(uniform);
         }
-        );
+    );
+    /*  One other thing worth noting:
+        Connecting directly to functions bypasses the signal/slot mechanism and
+        may not be safe to use in a multi-threaded environment! */
 
     return w;
 }

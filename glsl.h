@@ -27,22 +27,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "opengl.h"
 
+
 /** Container for a GLSL uniform. */
 struct Uniform
 {
-    /** Name as in the shader */
-    QString name;
-    /** Type of the uniform */
-    GLenum type;
-    /** Number of instances (for arrays) */
-    GLint size;
-    /** Uniform location, to send the stuff over */
-    GLint location;
+    // ------- public member ---------
 
+    /** A vector of floats,
+        for types GL_FLOAT, GL_FLOAT_VEC2, GL_FLOAT_VEC3 and GL_FLOAT_VEC4. */
     GLfloat floats[4];
 
-    /** Constructor (clears all contents) */
+    /** Name as in the shader source */
+    const QString& name() const { return name_; }
+    /** Type of the uniform (as OpenGL enum) */
+    GLenum type() const { return type_; }
+    /** Number of instances (for arrays) */
+    GLint size() const { return size_; }
+    /** Uniform location, to send the stuff over */
+    GLint location() const { return location_; }
+
+    friend class Glsl;
+    friend class std::auto_ptr<Uniform>;
+
+    // ----------- private area -----------
+private:
+
+    /** Constructor (initializes all to zero) */
     Uniform();
+    /** Private destructor to avoid stupid things. */
+    ~Uniform() { }
+
+    QString name_;
+    GLenum type_;
+    GLint size_;
+    GLint location_;
+
 };
 
 
@@ -62,11 +81,17 @@ public:
     /** Is the shader ready to use? */
     bool ready() const { return ready_; }
 
+    /** Returns if the shader has been activated.
+        @note If, after activation, activate() or deactivate() is called on a
+        different shader, this value will not reflect the GPU state! */
+    bool activated() const { return activated_; }
+
     /** Returns the number of used uniforms of this shader.
         Can be called after succesful compilation. */
     size_t numUniforms() const { return uniforms_.size(); }
 
     /** Returns a pointer to a uniform attached to this shader.
+        The public members of the Uniform struct can be manipulated.
         Can be called after succesful compilation.
         @p index must be < numUniforms() */
     Uniform * getUniform(size_t index) { return uniforms_[index].get(); }
@@ -96,13 +121,18 @@ public:
     /** Sets the GPU-value of the uniform to the contents provided by
         the @p uniform parameter.
         @note The shader must be activated. */
-    void setUniform(const Uniform * uniform);
+    void sendUniform(const Uniform * uniform);
+
+    /** Sends all uniform values to the GPU.
+        @note The shader must be activated. */
+    void sendUniforms();
 
 private:
 
+    /** Gets all used uniforms and populates the uniforms_ list */
     void getUniforms_();
 
-    /** Compiles one of the vertex/fragment shaders and attaches to programObject */
+    /** Compiles one of the vertex/fragment shaders and attaches to current programObject */
     bool compileShader_(GLenum type, const QString& typeName, const QString& source);
 
     QString vertSource_,
@@ -112,6 +142,7 @@ private:
     GLenum shader_;
 
     bool ready_;
+    bool activated_;
 
     std::vector<std::auto_ptr<Uniform>> uniforms_;
 };
