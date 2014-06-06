@@ -37,6 +37,10 @@ public:
     /** Create a box model */
     Model * createBox(float sidelength_x, float sidelength_y, float sidelength_z) const;
 
+    Model * createUVSphere(float radius, unsigned int segmentsU, unsigned int segmentsV);
+
+    /** Create the famous OpenGL teapot */
+    Model * createTeapot(float scale);
 };
 
 #endif // MODELFACTORY_H

@@ -39,7 +39,8 @@ HEADERS  += \
     glsl.h \
     opengl.h \
     glslhighlighter.h \
-    uniformwidgetfactory.h
+    uniformwidgetfactory.h \
+    teapot_data.h
 
 FORMS    += \
     mainwindow.ui

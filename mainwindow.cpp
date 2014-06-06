@@ -121,7 +121,23 @@ void MainWindow::createMainMenu_()
     connect(a, &QAction::triggered, [=]()
     {
         ModelFactory f;
-        Model * m = f.createCube(2);
+        Model * m = f.createCube(5);
+        renderer_->setModel(m);
+    });
+    a = new QAction(tr("Create &UV-Sphere"), this);
+    m->addAction(a);
+    connect(a, &QAction::triggered, [=]()
+    {
+        ModelFactory f;
+        Model * m = f.createUVSphere(5, 5, 5);
+        renderer_->setModel(m);
+    });
+    a = new QAction(tr("Create famous &Teapot"), this);
+    m->addAction(a);
+    connect(a, &QAction::triggered, [=]()
+    {
+        ModelFactory f;
+        Model * m = f.createTeapot(1.f);
         renderer_->setModel(m);
     });
 

@@ -38,6 +38,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <glm/core/func_geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// ----------- good-to-have constants -------------
+
+/** the infamous PI */
+#ifndef PI
+#define PI (3.1415926535897932384626433832795)
+#endif
+
+/** 2.0 * PI */
+#ifndef TWO_PI
+#define TWO_PI (6.283185307179586476925286766559)
+#endif
+
 
 // --------- our floating-point numeric type --------
 
@@ -53,6 +65,25 @@ typedef glm::detail::tvec4<Float> Vec4;
 typedef glm::detail::tmat3x3<Float> Mat3;
 typedef glm::detail::tmat4x4<Float> Mat4;
 
+// ------------- some functions -----------------
+
+/** Returns a point on a unit sphere (radius = 1.0). <br>
+Given a point P = <0,1,0>, and v = rotation around z, and u = rotation around y <br>
+then the result is the rotated P. <br>
+u and v are in the range of 0..1 for the whole sphere */
+template <typename F>
+glm::detail::tvec3<F> pointOnSphere(F u, F v)
+{
+    u *= TWO_PI,
+    v *= PI;
+    auto P = glm::detail::tvec3<F>(
+    // rotate a point (0,1,0) around z
+        -sin(v), std::cos(v), 0 );
+    // rotate this point around y
+    P.z = -P.x * std::sin(u);
+    P.x =  P.x * std::cos(u);
+    return P;
+}
 
 // ------------ iostream bindings ---------------
 
