@@ -23,9 +23,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "debug.h"
 
 Model::Model()
-    :   curR_   (1.f),
-        curG_   (1.f),
-        curB_   (1.f),
+    :   curR_   (.5f),
+        curG_   (.5f),
+        curB_   (.5f),
         curA_   (1.f)
 {
 }

@@ -53,6 +53,12 @@ void Basic3DWidget::viewRotateY(Float d)
     updateGL();
 }
 
+void Basic3DWidget::viewZoom(Float zoom)
+{
+    distanceZ_ -= zoom;
+    updateGL();
+}
+
 Mat4 Basic3DWidget::transformationMatrix() const
 {
     Mat4 m = glm::translate(Mat4(), Vec3(0,0,-distanceZ_));
@@ -76,6 +82,10 @@ void Basic3DWidget::mouseMoveEvent(QMouseEvent * e)
     {
         viewRotateX(dy);
         viewRotateY(dx);
+    }
+    if (e->buttons() & Qt::RightButton)
+    {
+        viewZoom(dy * 0.1);
     }
 }
 

@@ -62,6 +62,8 @@ public slots:
     void viewRotateX(Float degree);
     /** Continously rotate around the y-axis */
     void viewRotateY(Float degree);
+    /** Zooms in (+) or out (-) */
+    void viewZoom(Float zoom);
 
 protected:
 
