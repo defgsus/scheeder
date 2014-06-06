@@ -77,6 +77,11 @@ void AppSettings::createDefaultValues_()
     defaultValues_.insert("vertex_source", default_vertex_source);
     defaultValues_.insert("fragment_source", default_fragment_source);
     defaultValues_.insert("source_path", QString("./"));
+
+    defaultValues_.insert("RenderSettings/doDepthTest", true);
+    defaultValues_.insert("RenderSettings/doCullFace", true);
+    defaultValues_.insert("RenderSettings/doFrontFaceCCW", true);
+    defaultValues_.insert("RenderSettings/doDrawCoords", true);
 }
 
 
@@ -88,7 +93,7 @@ QVariant AppSettings::getValue(const QString &key) const
         return value(key);
 
     // check if in default settings
-    Q_ASSERT(defaultValues_.contains(key));
+    Q_ASSERT_X(defaultValues_.contains(key), "AppSettings::getValue", key.toStdString().c_str());
 
     // return from default settings
     if (defaultValues_.contains(key))

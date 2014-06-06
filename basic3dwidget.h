@@ -91,7 +91,6 @@ private:
     Float distanceZ_;
 
     QPoint lastMousePos_;
-
 };
 
 #endif // BASIC3DWIDGET_H

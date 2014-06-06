@@ -28,6 +28,7 @@ Basic3DWidget::Basic3DWidget(QWidget *parent) :
     viewInit();
 }
 
+
 void Basic3DWidget::viewInit(Float distanceZ)
 {
     distanceZ_ = distanceZ;
@@ -151,3 +152,4 @@ void Basic3DWidget::drawCoords_(int len)
 
     glEnd();
 }
+

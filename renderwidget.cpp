@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <glm/gtc/type_ptr.hpp>
 
 #include "renderwidget.h"
+#include "appsettings.h"
 #include "model.h"
 #include "glsl.h"
 #include "debug.h"
@@ -34,6 +35,8 @@ RenderWidget::RenderWidget(QWidget *parent) :
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(256,256);
+
+    reconfigure();
 }
 
 RenderWidget::~RenderWidget()
@@ -42,6 +45,16 @@ RenderWidget::~RenderWidget()
         delete model_;
     if (shader_)
         delete shader_;
+}
+
+void RenderWidget::reconfigure()
+{
+    doDepthTest_ = appSettings->getValue("RenderSettings/doDepthTest").toBool();
+    doCullFace_ = appSettings->getValue("RenderSettings/doCullFace").toBool();
+    doFrontFaceCCW_ = appSettings->getValue("RenderSettings/doFrontFaceCCW").toBool();
+    doDrawCoords_ = appSettings->getValue("RenderSettings/doDrawCoords").toBool();
+
+    update();
 }
 
 void RenderWidget::setModel(Model * m)
@@ -64,19 +77,15 @@ void RenderWidget::setShader(Glsl *s)
     update();
 }
 
-void RenderWidget::initializeGL()
-{
-    Basic3DWidget::initializeGL();
-
-    SCH_CHECK_GL( glEnable(GL_DEPTH_TEST) );
-    SCH_CHECK_GL( glEnable(GL_CULL_FACE) );
-}
 
 void RenderWidget::paintGL()
 {
+    applyOptions_();
+
     Basic3DWidget::paintGL();
 
-    drawCoords_(10);
+    if (doDrawCoords_)
+        drawCoords_(10);
 
     if (shader_)
     {
@@ -91,4 +100,21 @@ void RenderWidget::paintGL()
         shader_->deactivate();
 }
 
+void RenderWidget::applyOptions_()
+{
+    if (doDepthTest_)
+        SCH_CHECK_GL( glEnable(GL_DEPTH_TEST) )
+    else
+        SCH_CHECK_GL( glDisable(GL_DEPTH_TEST) );
+
+    if (doCullFace_)
+        SCH_CHECK_GL( glEnable(GL_CULL_FACE) )
+    else
+        SCH_CHECK_GL( glDisable(GL_CULL_FACE) );
+
+    if (doFrontFaceCCW_)
+        SCH_CHECK_GL( glFrontFace(GL_CCW) )
+    else
+        SCH_CHECK_GL( glFrontFace(GL_CW) );
+}
 

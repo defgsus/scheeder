@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 namespace Ui { class MainWindow; }
 class QDockWidget;
 class QTextBrowser;
+class QAction;
 class RenderWidget;
 class SourceWidget;
 class Glsl;
@@ -66,6 +67,8 @@ private:
     void createWidgets_();
     /** Creates all the menu actions */
     void createMainMenu_();
+
+    QAction * createRenderOptionAction_(const QString& option, const QString& name);
 
     /** Returns a new dock-widget with default settings */
     QDockWidget * getDockWidget_(const QString& obj_id, const QString& title);

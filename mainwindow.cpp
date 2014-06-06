@@ -183,6 +183,29 @@ void MainWindow::createMainMenu_()
 
     menuBar()->addMenu(m);
 
+    // --- options menu ---
+    m = new QMenu(tr("&Options"), this);
+    m->addAction(createRenderOptionAction_("doDrawCoords", "draw coordinates"));
+    m->addAction(createRenderOptionAction_("doDepthTest", "depth test"));
+    m->addAction(createRenderOptionAction_("doCullFace", "cull faces"));
+    m->addAction(createRenderOptionAction_("doFrontFaceCCW", "front is counter-clockwise"));
+
+
+    menuBar()->addMenu(m);
+
+}
+
+QAction * MainWindow::createRenderOptionAction_(const QString& option, const QString& name)
+{
+    QAction * a = new QAction(name, this);
+    a->setCheckable(true);
+    a->setChecked(appSettings->getValue("RenderSettings/"+option).toBool());
+    connect(a, &QAction::triggered, [=](bool checked)
+    {
+        appSettings->setValue("RenderSettings/"+option, checked);
+        renderer_->reconfigure();
+    });
+    return a;
 }
 
 
@@ -291,7 +314,7 @@ void MainWindow::compileShader()
     renderer_->update();
 }
 
-void MainWindow::slotUniformChanged(Uniform * u)
+void MainWindow::slotUniformChanged(Uniform * )
 {
     //qDebug() << "changed uniform" << u->name() << u->floats[0] << u->floats[1] << u->floats[2];
     renderer_->update();

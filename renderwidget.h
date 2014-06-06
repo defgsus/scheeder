@@ -39,6 +39,9 @@ signals:
 
 public slots:
 
+    /** Applies AppSettings */
+    void reconfigure();
+
     /** Sets the Model to be rendered.
         Ownership of class is taken! */
     void setModel(Model * m);
@@ -48,13 +51,22 @@ public slots:
     void setShader(Glsl * s);
 
 protected:
-    virtual void initializeGL();
 
     virtual void paintGL();
 
+    /** Sets the OpenGL state to the current set options */
+    void applyOptions_();
+
 private:
+
     Model * model_;
     Glsl * shader_;
+
+    // options
+    bool doDepthTest_,
+         doCullFace_,
+         doFrontFaceCCW_,
+         doDrawCoords_;
 };
 
 #endif // RENDERWIDGET_H
