@@ -37,6 +37,7 @@ public:
     /** Create a box model */
     Model * createBox(float sidelength_x, float sidelength_y, float sidelength_z) const;
 
+    /** Create an uv-sphere */
     Model * createUVSphere(float radius, unsigned int segmentsU, unsigned int segmentsV);
 
     /** Create the famous OpenGL teapot */

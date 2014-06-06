@@ -43,6 +43,36 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setObjectName("MainWindow");
 
+    // uniform factory/controller
+    uniFactory_ = new UniformWidgetFactory(this);
+
+    createWidgets_();
+    createMainMenu_();
+
+    restoreWidgetsGeometry_();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui_;
+}
+
+QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
+{
+    auto dw = new QDockWidget(title, this);
+    // set an object name because we want to store the layout settings
+    dw->setObjectName(obj_id);
+
+    // disable close feature
+    dw->setFeatures(QDockWidget::DockWidgetMovable);
+    // make it large XXX seems to be ignored :(
+    dw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    return dw;
+}
+
+void MainWindow::createWidgets_()
+{
     ui_->setupUi(this);
 
     // render window
@@ -81,32 +111,6 @@ MainWindow::MainWindow(QWidget *parent) :
     dw = getDockWidget_("uni_edit", tr("shader uniforms"));
     dw->setWidget(uniEdit_);
     addDockWidget(Qt::BottomDockWidgetArea, dw);
-
-    // uniform factory/controller
-    uniFactory_ = new UniformWidgetFactory(this);
-
-    createMainMenu_();
-
-    restoreWidgetsGeometry_();
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui_;
-}
-
-QDockWidget * MainWindow::getDockWidget_(const QString &obj_id, const QString &title)
-{
-    auto dw = new QDockWidget(title, this);
-    // set an object name because we want to store the layout settings
-    dw->setObjectName(obj_id);
-
-    // disable close feature
-    dw->setFeatures(QDockWidget::DockWidgetMovable);
-    // make it large XXX seems to be ignored :(
-    dw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    return dw;
 }
 
 void MainWindow::createMainMenu_()
@@ -157,7 +161,7 @@ void MainWindow::createMainMenu_()
     connect(a, &QAction::triggered, [=]()
     {
         ModelFactory f;
-        Model * m = f.createUVSphere(5, 5, 5);
+        Model * m = f.createUVSphere(5, 20, 20);
         renderer_->setModel(m);
     });
     a = new QAction(tr("Create famous &Teapot"), this);
@@ -277,7 +281,7 @@ void MainWindow::compileShader()
 
     updateUniformWidgets_();
 
-    // connct uniform updates
+    // connect uniform updates
     if (shader_->ready())
     {
         connect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
@@ -289,9 +293,13 @@ void MainWindow::compileShader()
 
 void MainWindow::slotUniformChanged(Uniform * u)
 {
-    qDebug() << "changed uniform" << u->name() << u->floats[0] << u->floats[1] << u->floats[2];
+    //qDebug() << "changed uniform" << u->name() << u->floats[0] << u->floats[1] << u->floats[2];
     renderer_->update();
 }
+
+
+
+// -------------------- SOURCE LOAD/SAVE ----------------------------
 
 void MainWindow::slotSaveShader()
 {

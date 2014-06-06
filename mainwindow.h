@@ -62,6 +62,8 @@ private slots:
     void slotLoadFragmentShader();
 
 private:
+    /** Creates all the main widgets */
+    void createWidgets_();
     /** Creates all the menu actions */
     void createMainMenu_();
 

@@ -101,8 +101,10 @@ Model * ModelFactory::createUVSphere(float rad, unsigned int segu, unsigned int 
 
     for (unsigned int v = 1; v<segv; ++v)
     {
+        // current vertex offset
         int rown = m->numVertices();
 
+        // body vertices
         for (unsigned int u = 0; u<segu; ++u)
         {
             Vec3 p = pointOnSphere((float)u / segu, (float)v / segv);
@@ -110,19 +112,40 @@ Model * ModelFactory::createUVSphere(float rad, unsigned int segu, unsigned int 
             m->addVertex(p.x * rad, p.y * rad, p.z * rad);
         }
 
+        // triangles on each 'row'
         for (unsigned int u = 0; u<segu; ++u)
         {
             // connect to top point
             if (v==1)
             {
-                m->addTriangle(0, (rown + u) % segu, (rown + u + 1) % segu);
+                m->addTriangle(0, rown + u, rown + (u + 1) % segu);
             }
             else
             {
-                m->addTriangle((rown + u) % segu - segu, (rown + u) % segu, (rown + u + 1) % segu);
+                // connect
+                m->addTriangle(
+                // previous row
+                    rown - segu + u,
+                // with this row
+                    rown + u, rown + (u + 1) % segu);
+                // .. and the other triangle of the quad
+                m->addTriangle(rown - segu + (u + 1) % segu,
+                               rown - segu + u,
+                               rown + (u + 1) % segu);
             }
         }
+    }
 
+    int rown = m->numVertices() - segu - 1;
+
+    // bottom point
+    m->addVertex(0, -rad, 0);
+
+    // connect to bottom point
+    for (unsigned int u = 0; u<segu; ++u)
+    {
+        m->addTriangle(m->numVertices()-1,
+                       rown + (u + 1) % segu, rown + u);
     }
 
     m->calculateTriangleNormals();
