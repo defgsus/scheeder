@@ -17,12 +17,15 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
+
 #include <QDebug>
 #include <QDockWidget>
 #include <QMenu>
 #include <QTextBrowser>
 #include <QCloseEvent>
 #include <QLayout>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -52,14 +55,16 @@ MainWindow::MainWindow(QWidget *parent) :
     // vertex source
     editVert_ = new SourceWidget(this);
     editVert_->setText(appSettings->getValue("vertex_source").toString());
-    dw = getDockWidget_("vertex_source", tr("vertex source"));
+    editVert_->setModified(false);
+    dw = editVertDock_ = getDockWidget_("vertex_source", tr("vertex source"));
     dw->setWidget(editVert_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
     // fragment source
     editFrag_ = new SourceWidget(this);
     editFrag_->setText(appSettings->getValue("fragment_source").toString());
-    dw = getDockWidget_("fragment_source", tr("fragment source"));
+    editFrag_->setModified(false);
+    dw = editFragDock_ = getDockWidget_("fragment_source", tr("fragment source"));
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 
@@ -108,9 +113,22 @@ void MainWindow::createMainMenu_()
 {
     // --- file menu ---
     QMenu * m = new QMenu(tr("&File"), this);
-    QAction * a = new QAction(tr("&Close"), this);
+    QAction * a = new QAction(tr("&Exit"), this);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(close()));
+    m->addSeparator();
+    a = new QAction(tr("&Save all"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShader()));
+    a = new QAction(tr("&Save all as ..."), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShaderAs()));
+    a = new QAction(tr("Save &vertex source as ..."), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotSaveVertexShaderAs()));
+    a = new QAction(tr("Save &fragment source as ..."), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotSaveFragmentShaderAs()));
 
     menuBar()->addMenu(m);
 
@@ -263,4 +281,145 @@ void MainWindow::slotUniformChanged(Uniform * u)
 {
     qDebug() << "changed uniform" << u->name() << u->floats[0] << u->floats[1] << u->floats[2];
     renderer_->update();
+}
+
+void MainWindow::slotSaveShader()
+{
+    if (editVert_->filename().isEmpty())
+    {
+        if (!slotSaveVertexShaderAs())
+            return;
+    }
+    else
+        editVert_->saveFile(editVert_->filename());
+
+    if (editFrag_->filename().isEmpty())
+    {
+        if (!slotSaveFragmentShaderAs())
+            return;
+    }
+    else
+        editFrag_->saveFile(editFrag_->filename());
+
+    updateSourceTitles_();
+}
+
+void MainWindow::slotSaveShaderAs()
+{
+choose_again:
+    QString fn =
+        QFileDialog::getSaveFileName(this,
+            tr("Save shader source (.vert & .frag)"),
+            appSettings->getValue("source_path").toString()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return;
+
+    QString vname = fn + ".vert",
+            fname = fn + ".frag";
+
+    // see if existing
+
+    bool vexists = QFile::exists(vname),
+         fexists = QFile::exists(fname);
+
+    if (vexists || fexists)
+    {
+        QString text;
+        if (vexists && fexists)
+            text = tr("%1 and %2 already exist.\nDo you want to overwrite them?")
+                    .arg(vname).arg(fname);
+        else
+            text = tr("%1 already exists.\nDo you want to overwrite it?")
+                    .arg(vexists? vname : fname);
+        // ask user what to do
+        QMessageBox::StandardButton ret =
+            QMessageBox::question(this, tr("confirm overwrite"), text,
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                    QMessageBox::No);
+
+        if (ret == QMessageBox::Cancel)
+            return;
+        if (ret == QMessageBox::No)
+            goto choose_again;
+    }
+
+    // save both
+    editVert_->saveFile(vname);
+    editFrag_->saveFile(fname);
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn).absolutePath());
+    // update titles
+    updateSourceTitles_();
+}
+
+bool MainWindow::slotSaveVertexShaderAs()
+{
+    QString fn =
+        QFileDialog::getSaveFileName(this,
+            tr("Save vertex shader source"),
+            // choose stored path or previous filename
+            editVert_->filename().isEmpty() ?
+                    appSettings->getValue("source_path").toString()
+                :   editVert_->filename()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return false;
+
+    if (!editVert_->saveFile(fn))
+        return true;
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn).absolutePath());
+    // update titles
+    updateSourceTitles_();
+
+    return true;
+}
+
+bool MainWindow::slotSaveFragmentShaderAs()
+{
+    QString fn =
+        QFileDialog::getSaveFileName(this,
+            tr("Save fragment shader source"),
+            editFrag_->filename().isEmpty() ?
+                    appSettings->getValue("source_path").toString()
+                :   editFrag_->filename()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return false;
+
+    if (!editFrag_->saveFile(fn))
+        return true;
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn).absolutePath());
+    // update titles
+    updateSourceTitles_();
+
+    return true;
+}
+
+void MainWindow::updateSourceTitles_()
+{
+    QString title = tr("vertex source");
+    if (editVert_->modified())
+        title += " *";
+    if (!editVert_->filename().isEmpty())
+        title += " [" + editVert_->filename() + "]";
+    editVertDock_->setWindowTitle(title);
+
+    title = tr("fragment source");
+    if (editFrag_->modified())
+        title += " *";
+    if (!editFrag_->filename().isEmpty())
+        title += " [" + editFrag_->filename() + "]";
+    editFragDock_->setWindowTitle(title);
 }

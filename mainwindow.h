@@ -49,7 +49,13 @@ private slots:
 
     void compileShader();
 
+    /** When a uniform is changed from a widget */
     void slotUniformChanged(Uniform *);
+
+    void slotSaveShader();
+    void slotSaveShaderAs();
+    bool slotSaveVertexShaderAs();
+    bool slotSaveFragmentShaderAs();
 
 private:
     /** Creates all the menu actions */
@@ -66,6 +72,7 @@ private:
 
     void updateUniformWidgets_();
     void deleteUniformWidgets_();
+    void updateSourceTitles_();
 
     // -------------- private member ---------------------
 
@@ -73,6 +80,7 @@ private:
 
     RenderWidget * renderer_;
     SourceWidget * editVert_, * editFrag_;
+    QDockWidget * editVertDock_, * editFragDock_;
 
     QWidget * uniEdit_;
     UniformWidgetFactory * uniFactory_;

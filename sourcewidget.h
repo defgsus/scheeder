@@ -35,14 +35,23 @@ public:
 
     ~SourceWidget();
 
+    const QString& filename() const { return filename_; }
+    bool modified() const { return modified_; }
+    void setModified(bool modified) { modified_ = modified; }
 signals:
 
 public slots:
+
+    bool loadFile(const QString& filename);
+    bool saveFile(const QString& filename);
 
 private:
 
     /** Associated highlighter */
     QSyntaxHighlighter * highlighter_;
+
+    QString filename_;
+    bool modified_;
 };
 
 #endif // SOURCEWIDGET_H
