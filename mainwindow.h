@@ -57,6 +57,10 @@ private slots:
     bool slotSaveVertexShaderAs();
     bool slotSaveFragmentShaderAs();
 
+    void slotLoadShader();
+    void slotLoadVertexShader();
+    void slotLoadFragmentShader();
+
 private:
     /** Creates all the menu actions */
     void createMainMenu_();

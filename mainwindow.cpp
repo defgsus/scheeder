@@ -129,6 +129,16 @@ void MainWindow::createMainMenu_()
     a = new QAction(tr("Save &fragment source as ..."), this);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveFragmentShaderAs()));
+    m->addSeparator();
+    a = new QAction(tr("&Load all"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
+    a = new QAction(tr("Load v&ertex source as ..."), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadVertexShader()));
+    a = new QAction(tr("Load f&ragment source as ..."), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadFragmentShader()));
 
     menuBar()->addMenu(m);
 
@@ -422,4 +432,75 @@ void MainWindow::updateSourceTitles_()
     if (!editFrag_->filename().isEmpty())
         title += " [" + editFrag_->filename() + "]";
     editFragDock_->setWindowTitle(title);
+}
+
+void MainWindow::slotLoadShader()
+{
+    QStringList fn =
+        QFileDialog::getOpenFileNames(this,
+            tr("Load vertex & fragment shader source"),
+            appSettings->getValue("source_path").toString()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return;
+
+    for (int i=0; i<2; ++i)
+    if (i < fn.size())
+    {
+        if (fn[i].contains(".vert"))
+            editVert_->loadFile(fn[i]);
+        else if (fn[i].contains(".frag"))
+            editFrag_->loadFile(fn[i]);
+    }
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn[0]).absolutePath());
+    // update titles
+    updateSourceTitles_();
+}
+
+void MainWindow::slotLoadVertexShader()
+{
+    QString fn =
+        QFileDialog::getOpenFileName(this,
+            tr("Load vertex shader source"),
+            editVert_->filename().isEmpty() ?
+                    appSettings->getValue("source_path").toString()
+                :   editVert_->filename()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return;
+
+    editVert_->loadFile(fn);
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn).absolutePath());
+    // update titles
+    updateSourceTitles_();
+}
+
+void MainWindow::slotLoadFragmentShader()
+{
+    QString fn =
+        QFileDialog::getOpenFileName(this,
+            tr("Load fragment shader source"),
+            editFrag_->filename().isEmpty() ?
+                    appSettings->getValue("source_path").toString()
+                :   editFrag_->filename()
+            );
+
+    // aborted?
+    if (fn.isEmpty())
+        return;
+
+    editFrag_->loadFile(fn);
+
+    // store current file path
+    appSettings->setValue("source_path", QDir(fn).absolutePath());
+    // update titles
+    updateSourceTitles_();
 }

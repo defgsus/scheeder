@@ -61,10 +61,7 @@ bool SourceWidget::loadFile(const QString &fn)
 
     QTextStream in(&file);
 
-    QString text;
-    in >> text;
-
-    setPlainText(text);
+    setPlainText(in.readAll());
 
     modified_ = false;
     filename_ = fn;
