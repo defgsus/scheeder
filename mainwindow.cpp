@@ -122,9 +122,11 @@ void MainWindow::createMainMenu_()
     connect(a, SIGNAL(triggered()), this, SLOT(close()));
     m->addSeparator();
     a = new QAction(tr("&Save all"), this);
+    a->setShortcut(Qt::CTRL + Qt::Key_S);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShader()));
     a = new QAction(tr("&Save all as ..."), this);
+    a->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShaderAs()));
     a = new QAction(tr("Save &vertex source as ..."), this);
@@ -135,6 +137,7 @@ void MainWindow::createMainMenu_()
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveFragmentShaderAs()));
     m->addSeparator();
     a = new QAction(tr("&Load all"), this);
+    a->setShortcut(Qt::CTRL + Qt::Key_L);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
     a = new QAction(tr("Load v&ertex source as ..."), this);
@@ -197,14 +200,18 @@ void MainWindow::createMainMenu_()
 
 QAction * MainWindow::createRenderOptionAction_(const QString& option, const QString& name)
 {
+    // create a checkable action
     QAction * a = new QAction(name, this);
     a->setCheckable(true);
+    // get value from settings
     a->setChecked(appSettings->getValue("RenderSettings/"+option).toBool());
+    // on click: change settings and tell renderer to reload settings
     connect(a, &QAction::triggered, [=](bool checked)
     {
         appSettings->setValue("RenderSettings/"+option, checked);
         renderer_->reconfigure();
     });
+    // return a nice handy action
     return a;
 }
 
