@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     createMainMenu_();
 
     restoreWidgetsGeometry_();
+
+    if (doAutoCompile_)
+        compileShader();
 }
 
 MainWindow::~MainWindow()
@@ -78,6 +81,7 @@ void MainWindow::createWidgets_()
     // render window
     renderer_ = new RenderWidget(this);
     renderer_->setShader(shader_);
+    connect(renderer_, SIGNAL(shaderCompiled()), this, SLOT(slotShaderCompiled()));
     auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));
     dw->setWidget(renderer_);
     addDockWidget(Qt::LeftDockWidgetArea, dw);
@@ -86,6 +90,7 @@ void MainWindow::createWidgets_()
     editVert_ = new SourceWidget(this);
     editVert_->setText(appSettings->getValue("vertex_source").toString());
     editVert_->setModified(false);
+    connect(editVert_, SIGNAL(textChanged()), this, SLOT(slotSourceChanged()));
     dw = editVertDock_ = getDockWidget_("vertex_source", tr("vertex source"));
     dw->setWidget(editVert_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
@@ -94,6 +99,7 @@ void MainWindow::createWidgets_()
     editFrag_ = new SourceWidget(this);
     editFrag_->setText(appSettings->getValue("fragment_source").toString());
     editFrag_->setModified(false);
+    connect(editFrag_, SIGNAL(textChanged()), this, SLOT(slotSourceChanged()));
     dw = editFragDock_ = getDockWidget_("fragment_source", tr("fragment source"));
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
@@ -178,11 +184,25 @@ void MainWindow::createMainMenu_()
 
     menuBar()->addMenu(m);
 
+
     // --- shader menu ---
+
     m = new QMenu(tr("&Shader"), this);
     a = new QAction(tr("&Compile"), this);
+    a->setShortcut(Qt::ALT + Qt::Key_C);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(compileShader()));
+
+    a = new QAction(tr("&Automatic compile"), this);
+    a->setShortcut(Qt::ALT + Qt::SHIFT + Qt::Key_C);
+    doAutoCompile_ = a;
+    a->setCheckable(true);
+    a->setChecked(appSettings->getValue("auto_compile").toBool());
+    m->addAction(a);
+    connect(a, &QAction::triggered, [=](bool check)
+    {
+        appSettings->setValue("auto_compile", check);
+    });
 
     menuBar()->addMenu(m);
 
@@ -296,6 +316,11 @@ void MainWindow::deleteUniformWidgets_()
 }
 
 
+void MainWindow::slotSourceChanged()
+{
+    if (doAutoCompile_->isChecked())
+        compileShader();
+}
 
 void MainWindow::compileShader()
 {
@@ -306,19 +331,21 @@ void MainWindow::compileShader()
     shader_->setVertexSource(editVert_->toPlainText());
     shader_->setFragmentSource(editFrag_->toPlainText());
 
-    shader_->compile();
-    log_->setText(shader_->log());
+    // tell renderer to compile the shader
+    renderer_->requestCompileShader();
+}
 
-    updateUniformWidgets_();
+void MainWindow::slotShaderCompiled()
+{
+    log_->setText(shader_->log());
 
     // connect uniform updates
     if (shader_->ready())
     {
+        updateUniformWidgets_();
         connect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
                         this, SLOT(slotUniformChanged(Uniform*)));
     }
-
-    renderer_->update();
 }
 
 void MainWindow::slotUniformChanged(Uniform * )
@@ -333,21 +360,27 @@ void MainWindow::slotUniformChanged(Uniform * )
 
 void MainWindow::slotSaveShader()
 {
-    if (editVert_->filename().isEmpty())
+    if (editVert_->modified())
     {
-        if (!slotSaveVertexShaderAs())
-            return;
+        if (editVert_->filename().isEmpty())
+        {
+            if (!slotSaveVertexShaderAs())
+                return;
+        }
+        else
+            editVert_->saveFile(editVert_->filename());
     }
-    else
-        editVert_->saveFile(editVert_->filename());
 
-    if (editFrag_->filename().isEmpty())
+    if (editFrag_->modified())
     {
-        if (!slotSaveFragmentShaderAs())
-            return;
+        if (editFrag_->filename().isEmpty())
+        {
+            if (!slotSaveFragmentShaderAs())
+                return;
+        }
+        else
+            editFrag_->saveFile(editFrag_->filename());
     }
-    else
-        editFrag_->saveFile(editFrag_->filename());
 
     updateSourceTitles_();
 }

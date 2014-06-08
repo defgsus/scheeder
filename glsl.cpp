@@ -42,31 +42,40 @@ void Uniform::copyValuesFrom_(Uniform * u)
 }
 
 Glsl::Glsl()
-    :   shader_     (-1),
-        ready_      (false),
-        activated_  (false)
+    :   shader_         (-1),
+        sourceChanged_  (false),
+        ready_          (false),
+        activated_      (false)
 {
+    attribNamePosition_ = "a_position";
+    attribNameNormal_ = "a_normal";
+    attribNameColor_ = "a_color";
+    attribNameProjection_ = "a_projection";
+    attribNameTransformation_ = "a_transformation";
 }
 
 
 void Glsl::setVertexSource(const QString &text)
 {
     vertSource_ = text;
+    sourceChanged_ = true;
 }
 
 void Glsl::setFragmentSource(const QString &text)
 {
     fragSource_ = text;
+    sourceChanged_ = true;
 }
 
 
 bool Glsl::compile()
 {
-    // keep copy of previous uniforms
-    oldUniforms_ = uniforms_;
+    // temporarily save uniforms
+//    auto unicopy = uniforms_;
 
     // init state
     ready_ = false;
+    sourceChanged_ = false;
     log_ = "";
     uniforms_.clear();
 
@@ -74,7 +83,7 @@ bool Glsl::compile()
     SCH_CHECK_GL( if (glIsProgram(shader_)) glDeleteProgram(shader_) );
 
     // create shader object
-    SCH_CHECK_GL( shader_ = glCreateProgramObjectARB() );
+    SCH_CHECK_GL( shader_ = glCreateProgram() );
 
     // test if working
     if (!glIsProgram(shader_))
@@ -105,7 +114,11 @@ bool Glsl::compile()
         return false;
     }
 
+    getAttributes_();
     getUniforms_();
+
+    // keep copy of previous uniforms
+    oldUniforms_ = uniforms_;
 
     return ready_ = true;
 }
@@ -162,13 +175,13 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     if (blen > 1)
     {
         std::vector<GLchar> compiler_log(blen+1);
-        SCH_CHECK_GL( glGetInfoLogARB(shadername, blen, &slen, &compiler_log[0]) );
+        SCH_CHECK_GL( glGetShaderInfoLog(shadername, blen, &slen, &compiler_log[0]) );
         log_ += "compiler log:\n" + QString(&compiler_log[0]) + "\n";
         // error_line_(compiler_log, code));
     }
 
     // attach to programObject
-    SCH_CHECK_GL( glAttachObjectARB(shader_, shadername) );
+    SCH_CHECK_GL( glAttachShader(shader_, shadername) );
 
     return compiled;
 }
@@ -179,14 +192,24 @@ void Glsl::activate()
     if (!ready())
         return;
 
-    SCH_CHECK_GL( glUseProgramObjectARB(shader_) );
+    SCH_CHECK_GL( glUseProgram(shader_) );
     activated_ = true;
 }
 
 void Glsl::deactivate()
 {
-    SCH_CHECK_GL( glUseProgramObjectARB(0) );
+    // TODO
+    SCH_CHECK_GL( glUseProgram(0) );
     activated_ = false;
+}
+
+void Glsl::getAttributes_()
+{
+    SCH_CHECK_GL( attribPosition_ = glGetAttribLocation(shader_, attribNamePosition_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribNormal_ = glGetAttribLocation(shader_, attribNameNormal_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribColor_ = glGetAttribLocation(shader_, attribNameColor_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribProjection_ = glGetAttribLocation(shader_, attribNameProjection_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribTransformation_ = glGetAttribLocation(shader_, attribNameTransformation_.toStdString().c_str()) );
 }
 
 void Glsl::getUniforms_()
@@ -206,7 +229,7 @@ void Glsl::getUniforms_()
 
         u->location_ = i;
 
-        // plain old char* strings always need a bit of extra lines ..
+        // plain old char* strings always need a bit of extra code ..
         GLsizei length;
         std::vector<GLchar> name(labelLength);
         SCH_CHECK_GL(

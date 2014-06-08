@@ -80,6 +80,9 @@ public:
     /** Return the log from the last compilation */
     const QString& log() const { return log_; }
 
+    /** Has the source changed and shader needs recompilation? */
+    bool sourceChanged() const { return sourceChanged_; }
+
     /** Is the shader ready to use? */
     bool ready() const { return ready_; }
 
@@ -97,6 +100,10 @@ public:
         Can be called after succesful compilation.
         @p index must be < numUniforms() */
     Uniform * getUniform(size_t index) { return uniforms_[index].get(); }
+
+    GLint positionLocation() const { return attribPosition_; }
+    GLint normalLocation() const { return attribNormal_; }
+    GLint colorLocation() const { return attribColor_; }
 
     // ---------- source/compiler ------------
 
@@ -131,6 +138,9 @@ public:
 
 private:
 
+    /** Gets the standardized attributes. */
+    void getAttributes_();
+
     /** Gets all used uniforms and populates the uniforms_ list */
     void getUniforms_();
 
@@ -143,12 +153,26 @@ private:
 
     GLenum shader_;
 
-    bool ready_;
-    bool activated_;
+    bool sourceChanged_, ready_, activated_;
 
     std::vector<std::shared_ptr<Uniform>>
         uniforms_,
         oldUniforms_;
+
+    // --- attributes ---
+
+    GLint attribPosition_,
+          attribNormal_,
+          attribColor_,
+          attribProjection_,
+          attribTransformation_;
+
+    QString
+          attribNamePosition_,
+          attribNameNormal_,
+          attribNameColor_,
+          attribNameProjection_,
+          attribNameTransformation_;
 };
 
 #endif // GLSL_H

@@ -31,7 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 RenderWidget::RenderWidget(QWidget *parent) :
     Basic3DWidget   (parent),
     model_          (0),
-    shader_         (0)
+    shader_         (0),
+    requestCompile_ (false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(256,256);
@@ -77,6 +78,11 @@ void RenderWidget::setShader(Glsl *s)
     update();
 }
 
+void RenderWidget::requestCompileShader()
+{
+    requestCompile_ = true;
+    update();
+}
 
 void RenderWidget::paintGL()
 {
@@ -89,6 +95,12 @@ void RenderWidget::paintGL()
 
     if (shader_)
     {
+        if (requestCompile_)
+        {
+            requestCompile_ = false;
+            shader_->compile();
+            emit shaderCompiled();
+        }
         shader_->activate();
         shader_->sendUniforms();
     }

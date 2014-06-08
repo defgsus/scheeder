@@ -37,6 +37,10 @@ public:
 
 signals:
 
+    /** Emitted when shader was compiled after source-change,
+        regardless of success. */
+    void shaderCompiled();
+
 public slots:
 
     /** Applies AppSettings */
@@ -50,6 +54,9 @@ public slots:
         Ownership of class is taken! */
     void setShader(Glsl * s);
 
+    /** Please compile the shader in next paintGL() */
+    void requestCompileShader();
+
 protected:
 
     virtual void paintGL();
@@ -61,6 +68,8 @@ private:
 
     Model * model_;
     Glsl * shader_;
+
+    bool requestCompile_;
 
     // options
     bool doDepthTest_,

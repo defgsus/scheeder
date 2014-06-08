@@ -31,7 +31,7 @@ class QAction;
 class RenderWidget;
 class SourceWidget;
 class Glsl;
-class Uniform;
+struct Uniform;
 class UniformWidgetFactory;
 
 class MainWindow : public QMainWindow
@@ -49,6 +49,8 @@ protected:
 private slots:
 
     void compileShader();
+    void slotSourceChanged();
+    void slotShaderCompiled();
 
     /** When a uniform is changed from a widget */
     void slotUniformChanged(Uniform *);
@@ -97,6 +99,8 @@ private:
     QTextBrowser * log_;
 
     Glsl * shader_;
+
+    QAction * doAutoCompile_;
 };
 
 #endif // MAINWINDOW_H

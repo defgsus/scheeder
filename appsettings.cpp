@@ -77,6 +77,7 @@ void AppSettings::createDefaultValues_()
     defaultValues_.insert("vertex_source", default_vertex_source);
     defaultValues_.insert("fragment_source", default_fragment_source);
     defaultValues_.insert("source_path", QString("./"));
+    defaultValues_.insert("auto_compile", true);
 
     defaultValues_.insert("RenderSettings/doDepthTest", true);
     defaultValues_.insert("RenderSettings/doCullFace", true);

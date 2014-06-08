@@ -17,14 +17,26 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-
+/** @file
+    @brief system-independent wrapper for opengl headers.
+*/
 #ifndef OPENGL_H
 #define OPENGL_H
 
-// enable openGL extensions
-#define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
-#include <GL/glext.h>
+#ifdef __APPLE__
+
+#   include <gl.h>
+#   include <glext.h>
+
+#else
+
+    // enable openGL extensions
+#   define GL_GLEXT_PROTOTYPES
+#   include <GL/gl.h>
+#   include <GL/glext.h>
+
+#endif
+
 
 #endif // OPENGL_H
