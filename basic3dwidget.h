@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef BASIC3DWIDGET_H
 #define BASIC3DWIDGET_H
 
+#include "opengl.h"
+
 #include <QGLWidget>
 
 #include "vector.h"
@@ -48,6 +50,9 @@ class Basic3DWidget : public QGLWidget
     Q_OBJECT
 public:
     explicit Basic3DWidget(QWidget *parent = 0);
+
+    /** Returns the current projection matrix */
+    const Mat4& projectionMatrix() const { return projectionMatrix_; }
 
     /** Returns the current transformation matrix */
     Mat4 transformationMatrix() const;

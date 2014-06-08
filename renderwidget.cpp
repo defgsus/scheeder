@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 RenderWidget::RenderWidget(QWidget *parent) :
     Basic3DWidget   (parent),
     model_          (0),
+    newModel_       (0),
     shader_         (0),
     requestCompile_ (false)
 {
@@ -60,11 +61,8 @@ void RenderWidget::reconfigure()
 
 void RenderWidget::setModel(Model * m)
 {
-    if (model_)
-        delete model_;
-
-    model_ = m;
-
+    newModel_ = m;
+    m->unIndex();
     update();
 }
 
@@ -93,20 +91,62 @@ void RenderWidget::paintGL()
     if (doDrawCoords_)
         drawCoords_(10);
 
+    bool sendAttributes = false;
+
+    // if there's a new model ..
+    if (newModel_)
+    {
+        if (model_)
+        {
+            // .. delete the opengl resources
+            model_->releaseGL();
+            delete model_;
+        }
+        // and exchange
+        model_ = newModel_;
+        newModel_ = 0;
+        // we need to tell the model the attribute locations
+        sendAttributes = true;
+    }
+
     if (shader_)
     {
         if (requestCompile_)
         {
             requestCompile_ = false;
-            shader_->compile();
+            // (re-)compile shader
+            if (shader_->compile())
+                // and send the (possibly new) vertex attribute locations
+                // to the model
+                sendAttributes = true;
+            // also tell mainwindow
+            // to update the uniform widgets
             emit shaderCompiled();
         }
+
+        // activate shader and update uniform values
         shader_->activate();
         shader_->sendUniforms();
+        glUniformMatrix4fv(
+            shader_->getVertexAttributes().projection,
+            1, GL_FALSE, &projectionMatrix()[0][0]);
+        glUniformMatrix4fv(
+            shader_->getVertexAttributes().view,
+            1, GL_FALSE, &transformationMatrix()[0][0]);
     }
 
     if (model_)
-        model_->draw();
+    {
+        // compile model vao with new attribute locations
+        if (sendAttributes && shader_)
+            model_->setVertexAttributes(shader_->getVertexAttributes());
+
+        // and finally draw
+        if (model_->isVAO())
+            model_->draw();
+        else
+            model_->drawOldschool();
+    }
 
     if (shader_)
         shader_->deactivate();

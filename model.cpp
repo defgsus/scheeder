@@ -17,7 +17,7 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-
+#include <QDebug>
 #include "model.h"
 #include "vector.h"
 #include "debug.h"
@@ -26,7 +26,8 @@ Model::Model()
     :   curR_   (.5f),
         curG_   (.5f),
         curB_   (.5f),
-        curA_   (1.f)
+        curA_   (1.f),
+        isVAO_  (false)
 {
 }
 
@@ -67,7 +68,23 @@ void Model::addTriangle(IndexType p1, IndexType p2, IndexType p3)
     index_.push_back(p3);
 }
 
+void Model::setVertexAttributes(const ShaderAttributeLocations &v)
+{
+    attribs_ = v;
+    createVAO_();
+}
+
 void Model::draw() const
+{
+    SCH_CHECK_GL( glBindVertexArray(vao_) );
+
+    SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
+    //SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
+
+    SCH_CHECK_GL( glBindVertexArray(0) );
+}
+
+void Model::drawOldschool() const
 {
     SCH_CHECK_GL( glEnableClientState(GL_COLOR_ARRAY) );
     SCH_CHECK_GL( glEnableClientState(GL_NORMAL_ARRAY) );
@@ -139,3 +156,87 @@ void Model::calculateTriangleNormals()
     }
 
 }
+
+void Model::unIndex()
+{
+    qDebug() << "unindex";
+    auto vertex = vertex_;
+    auto normal = normal_;
+    auto color = color_;
+    auto index = index_;
+
+    vertex_.clear();
+    normal_.clear();
+    color_.clear();
+    index_.clear();
+
+    for (uint i=0; i<index.size()/3; ++i)
+    {
+        IndexType
+            i1 = index[i*3],
+            i2 = index[i*3+1],
+            i3 = index[i*3+2],
+
+            t1 = addVertex(vertex[i1*3], vertex[i1*3+1], vertex[i1*3+2],
+                           normal[i1*3], normal[i1*3+1], normal[i1*3+2],
+                           color[i1*4], color[i1*4+1], color[i1*4+2], color[i1*4+3]),
+            t2 = addVertex(vertex[i2*3], vertex[i2*3+1], vertex[i2*3+2],
+                           normal[i2*3], normal[i2*3+1], normal[i2*3+2],
+                           color[i2*4], color[i2*4+1], color[i2*4+2], color[i2*4+3]),
+            t3 = addVertex(vertex[i3*3], vertex[i3*3+1], vertex[i3*3+2],
+                           normal[i3*3], normal[i3*3+1], normal[i3*3+2],
+                           color[i3*4], color[i3*4+1], color[i3*4+2], color[i3*4+3]);
+
+        addTriangle(t1, t2, t3);
+    }
+
+qDebug() << "unindex end";
+    //calculateTriangleNormals();
+}
+
+
+
+void Model::releaseGL()
+{
+    if (glIsVertexArray(vao_))
+    {
+        SCH_CHECK_GL( glDeleteVertexArrays(1, &vao_) );
+        SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
+    }
+    isVAO_ = false;
+}
+
+void Model::createVAO_()
+{
+
+    // delete previous
+    releaseGL();
+
+    // create the object
+    SCH_CHECK_GL( glGenVertexArrays(1, &vao_) );
+    // and bind it
+    SCH_CHECK_GL( glBindVertexArray(vao_) );
+
+    // create buffers for vertex/color/normal
+
+    SCH_CHECK_GL( glGenBuffers(3, buffers_) );
+
+    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[0]) );
+    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, vertex_.size() * sizeof(VertexType), &vertex_[0], GL_STATIC_DRAW) );
+    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.position) );
+    SCH_CHECK_GL( glVertexAttribPointer(attribs_.position, 3, VertexEnum, GL_FALSE, 0, NULL) );
+
+    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[1]) );
+    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, normal_.size() * sizeof(NormalType), &normal_[0], GL_STATIC_DRAW) );
+    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.normal) );
+    SCH_CHECK_GL( glVertexAttribPointer(attribs_.normal, 3, NormalEnum, GL_FALSE, 0, NULL) );
+
+    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[2]) );
+    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, color_.size() * sizeof(ColorType), &color_[0], GL_STATIC_DRAW) );
+    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.color) );
+    SCH_CHECK_GL( glVertexAttribPointer(attribs_.color, 4, ColorEnum, GL_FALSE, 0, NULL) );
+
+    isVAO_ = true;
+}
+
+

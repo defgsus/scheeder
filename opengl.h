@@ -39,4 +39,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #endif
 
 
+/** Exchange of common vertex attribute locations.
+    @note This is totally specific to this application
+*/
+struct ShaderAttributeLocations
+{
+    // vertex attributes
+    GLuint
+        position,
+        normal,
+        color;
+    // uniforms
+    GLuint
+        projection,
+        view;
+};
+
+
 #endif // OPENGL_H

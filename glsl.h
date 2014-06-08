@@ -101,9 +101,11 @@ public:
         @p index must be < numUniforms() */
     Uniform * getUniform(size_t index) { return uniforms_[index].get(); }
 
-    GLint positionLocation() const { return attribPosition_; }
-    GLint normalLocation() const { return attribNormal_; }
-    GLint colorLocation() const { return attribColor_; }
+    /** Returns the vertex attribute locations used to send vertex
+        data to the shader.
+        Can be called after succesful compilation.
+    */
+    const ShaderAttributeLocations& getVertexAttributes() const { return attribs_; }
 
     // ---------- source/compiler ------------
 
@@ -161,18 +163,14 @@ private:
 
     // --- attributes ---
 
-    GLint attribPosition_,
-          attribNormal_,
-          attribColor_,
-          attribProjection_,
-          attribTransformation_;
+    ShaderAttributeLocations attribs_;
 
     QString
           attribNamePosition_,
           attribNameNormal_,
           attribNameColor_,
-          attribNameProjection_,
-          attribNameTransformation_;
+          uniformNameProjection_,
+          uniformNameView_;
 };
 
 #endif // GLSL_H

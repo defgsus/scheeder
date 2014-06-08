@@ -51,8 +51,8 @@ Glsl::Glsl()
     attribNamePosition_ = "a_position";
     attribNameNormal_ = "a_normal";
     attribNameColor_ = "a_color";
-    attribNameProjection_ = "a_projection";
-    attribNameTransformation_ = "a_transformation";
+    uniformNameProjection_ = "a_projection";
+    uniformNameView_ = "a_view";
 }
 
 
@@ -205,11 +205,11 @@ void Glsl::deactivate()
 
 void Glsl::getAttributes_()
 {
-    SCH_CHECK_GL( attribPosition_ = glGetAttribLocation(shader_, attribNamePosition_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribNormal_ = glGetAttribLocation(shader_, attribNameNormal_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribColor_ = glGetAttribLocation(shader_, attribNameColor_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribProjection_ = glGetAttribLocation(shader_, attribNameProjection_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribTransformation_ = glGetAttribLocation(shader_, attribNameTransformation_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.position = glGetAttribLocation(shader_, attribNamePosition_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.normal = glGetAttribLocation(shader_, attribNameNormal_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.color = glGetAttribLocation(shader_, attribNameColor_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.projection = glGetUniformLocation(shader_, uniformNameProjection_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.view = glGetUniformLocation(shader_, uniformNameView_.toStdString().c_str()) );
 }
 
 void Glsl::getUniforms_()

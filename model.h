@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "opengl.h"
 
+
+
 /** Abstraction around GL-arrays.
 
  */
@@ -59,6 +61,9 @@ public:
     /** Returns number of triangles in the Model */
     int numTriangles() const { return index_.size() / 3; }
 
+    /** Returns if a vertex array object has been initialized for this model. */
+    bool isVAO() const { return isVAO_; }
+
     // --------- state -----------------------
 
     /** Sets the current color. Any subsequent call to addVertex will
@@ -86,10 +91,34 @@ public:
         Normals that share multiple triangles will be averaged. */
     void calculateTriangleNormals();
 
-    /** Executes all drawing commands. */
+    void unIndex();
+
+    // ------------- opengl / drawing ---------------
+
+    /** @{ */
+    /** All these functions need to be called from within an opengl context! */
+
+    /** Release existing opengl resources.
+        Call this before deleting the model. */
+    void releaseGL();
+
+    /** Transmits the vertex attribute locations from the shader.
+        This needs to be called for Model to create it's vertex array object */
+    void setVertexAttributes(const ShaderAttributeLocations&);
+
+    /** Draws the vertex array object.
+        @note This needs a shader working with the vertex attributes. */
     void draw() const;
 
+    /** Draws the model through oldschool opengl arrays */
+    void drawOldschool() const;
+
+    /** @} */
+
 private:
+
+    /** Creates the vertexArrayObject from the initialized data. */
+    void createVAO_();
 
     std::vector<VertexType>       vertex_;
     std::vector<NormalType>       normal_;
@@ -99,6 +128,12 @@ private:
 
     ColorType
         curR_, curG_, curB_, curA_;
+
+    ShaderAttributeLocations attribs_;
+
+    /** vertex array object */
+    GLuint buffers_[3], vao_;
+    bool isVAO_;
 };
 
 #endif // MODEL_H

@@ -66,7 +66,7 @@ protected:
 
 private:
 
-    Model * model_;
+    Model * model_, * newModel_;
     Glsl * shader_;
 
     bool requestCompile_;
