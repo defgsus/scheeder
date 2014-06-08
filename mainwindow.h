@@ -31,7 +31,7 @@ class QAction;
 class RenderWidget;
 class SourceWidget;
 class Glsl;
-class Uniform;
+struct Uniform;
 class UniformWidgetFactory;
 
 class MainWindow : public QMainWindow

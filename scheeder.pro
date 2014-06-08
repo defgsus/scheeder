@@ -7,7 +7,14 @@
 TARGET = scheeder
 TEMPLATE = app
 
+
 QMAKE_CXXFLAGS += --std=c++0x
+
+macx {
+    QMAKE_CXXFLAGS += -std=c++11
+    CONFIG += c++11
+    INCLUDEPATH += /usr/local/include
+}
 
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets opengl

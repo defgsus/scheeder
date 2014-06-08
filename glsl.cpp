@@ -74,7 +74,7 @@ bool Glsl::compile()
     SCH_CHECK_GL( if (glIsProgram(shader_)) glDeleteProgram(shader_) );
 
     // create shader object
-    SCH_CHECK_GL( shader_ = glCreateProgramObjectARB() );
+    SCH_CHECK_GL( shader_ = *(GLenum*)glCreateProgramObjectARB() );
 
     // test if working
     if (!glIsProgram(shader_))
@@ -94,7 +94,7 @@ bool Glsl::compile()
         return false;
 
     // link program object
-    SCH_CHECK_GL( glLinkProgramARB(shader_) );
+    SCH_CHECK_GL( glLinkProgramARB(&shader_) );
 
     GLint linked;
     SCH_CHECK_GL( glGetProgramiv(shader_, GL_LINK_STATUS, &linked) );
@@ -117,7 +117,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
         return false;
 
     int shadername;
-    SCH_CHECK_GL( shadername = glCreateShaderObjectARB(type) );
+    SCH_CHECK_GL( shadername = *(int*)glCreateShaderObjectARB(type) );
     if (!glIsShader(shadername))
     {
         log_ += "error creating " + typeName + " ShaderObject\n";
@@ -138,7 +138,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     // attach source
     SCH_CHECK_GL( glShaderSource(shadername, 1, psrc, 0) );
     // compile
-    SCH_CHECK_GL( glCompileShaderARB(shadername) );
+    SCH_CHECK_GL( glCompileShaderARB(&shadername) );
 
     // check compile status
     bool compiled = false;
@@ -162,13 +162,13 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     if (blen > 1)
     {
         std::vector<GLchar> compiler_log(blen+1);
-        SCH_CHECK_GL( glGetInfoLogARB(shadername, blen, &slen, &compiler_log[0]) );
+        SCH_CHECK_GL( glGetInfoLogARB(&shadername, blen, &slen, &compiler_log[0]) );
         log_ += "compiler log:\n" + QString(&compiler_log[0]) + "\n";
         // error_line_(compiler_log, code));
     }
 
     // attach to programObject
-    SCH_CHECK_GL( glAttachObjectARB(shader_, shadername) );
+    SCH_CHECK_GL( glAttachObjectARB(&shader_, &shadername) );
 
     return compiled;
 }
@@ -179,7 +179,7 @@ void Glsl::activate()
     if (!ready())
         return;
 
-    SCH_CHECK_GL( glUseProgramObjectARB(shader_) );
+    SCH_CHECK_GL( glUseProgramObjectARB(&shader_) );
     activated_ = true;
 }
 
@@ -188,6 +188,8 @@ void Glsl::deactivate()
     SCH_CHECK_GL( glUseProgramObjectARB(0) );
     activated_ = false;
 }
+
+#define GL_MAX_LABEL_LENGTH 0x82E8
 
 void Glsl::getUniforms_()
 {

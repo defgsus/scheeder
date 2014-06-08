@@ -24,7 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // enable openGL extensions
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
-#include <GL/glext.h>
+#ifdef __APPLE__
+    #include <gl.h>
+    #include <glext.h>
+#elif
+    #include <GL/gl.h>
+    #include <GL/glext.h>
+#endif
 
 #endif // OPENGL_H

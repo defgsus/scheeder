@@ -35,7 +35,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/norm.hpp>
-#include <glm/core/func_geometric.hpp>
+//#include <glm/core/func_geometric.hpp>
+#include <glm/detail/func_geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 // ----------- good-to-have constants -------------
@@ -58,12 +59,12 @@ typedef float Float;
 
 // -------- basic vector and matrix types -------
 
-typedef glm::detail::tvec2<Float> Vec2;
-typedef glm::detail::tvec3<Float> Vec3;
-typedef glm::detail::tvec4<Float> Vec4;
+typedef glm::detail::tvec2<Float,glm::highp> Vec2;
+typedef glm::detail::tvec3<Float,glm::highp> Vec3;
+typedef glm::detail::tvec4<Float,glm::highp> Vec4;
 
-typedef glm::detail::tmat3x3<Float> Mat3;
-typedef glm::detail::tmat4x4<Float> Mat4;
+typedef glm::detail::tmat3x3<Float,glm::highp> Mat3;
+typedef glm::detail::tmat4x4<Float,glm::highp> Mat4;
 
 // ------------- some functions -----------------
 
@@ -72,11 +73,11 @@ Given a point P = <0,1,0>, and v = rotation around z, and u = rotation around y 
 then the result is the rotated P. <br>
 u and v are in the range of 0..1 for the whole sphere */
 template <typename F>
-glm::detail::tvec3<F> pointOnSphere(F u, F v)
+glm::detail::tvec3<F,glm::highp> pointOnSphere(F u, F v)
 {
     u *= TWO_PI,
     v *= PI;
-    auto P = glm::detail::tvec3<F>(
+    auto P = glm::detail::tvec3<F,glm::highp>(
     // rotate a point (0,1,0) around z
         -sin(v), std::cos(v), 0 );
     // rotate this point around y
@@ -88,32 +89,32 @@ glm::detail::tvec3<F> pointOnSphere(F u, F v)
 // ------------ iostream bindings ---------------
 
 /** stream output of a vector */
-template <typename F>
-std::ostream& operator << (std::ostream& s, const glm::detail::tvec2<F>& v)
+template <typename F,int P>
+std::ostream& operator << (std::ostream& s, const glm::detail::tvec2<F,P>& v)
 {
     s << '<' << v[0] << ", " << v[1] << '>';
     return s;
 }
 
 /** stream output of a vector */
-template <typename F>
-std::ostream& operator << (std::ostream& s, const glm::detail::tvec3<F>& v)
+template <typename F,int P>
+std::ostream& operator << (std::ostream& s, const glm::detail::tvec3<F,P>& v)
 {
     s << '<' << v[0] << ", " << v[1] << ", " << v[2] << '>';
     return s;
 }
 
 /** stream output of a vector */
-template <typename F>
-std::ostream& operator << (std::ostream& s, const glm::detail::tvec4<F>& v)
+template <typename F,int P>
+std::ostream& operator << (std::ostream& s, const glm::detail::tvec4<F,P>& v)
 {
     s << '<' << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << '>';
     return s;
 }
 
 /** stream output of a 3by3 matrix */
-template <typename F>
-std::ostream& operator << (std::ostream& s, const glm::detail::tmat3x3<F>& m)
+template <typename F,int P>
+std::ostream& operator << (std::ostream& s, const glm::detail::tmat3x3<F,P>& m)
 {
     for (int i=0; i<3; ++i)
     {
@@ -123,8 +124,8 @@ std::ostream& operator << (std::ostream& s, const glm::detail::tmat3x3<F>& m)
 }
 
 /** stream output of a 4by4 matrix */
-template <typename F>
-std::ostream& operator << (std::ostream& s, const glm::detail::tmat4x4<F>& m)
+template <typename F,int P>
+std::ostream& operator << (std::ostream& s, const glm::detail::tmat4x4<F,P>& m)
 {
     for (int i=0; i<4; ++i)
     {
