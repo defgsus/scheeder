@@ -41,6 +41,7 @@ void Uniform::copyValuesFrom_(Uniform * u)
     floats[3] = u->floats[3];
 }
 
+
 Glsl::Glsl()
     :   shader_         (-1),
         sourceChanged_  (false),
@@ -93,17 +94,17 @@ bool Glsl::compile()
     }
 
     // compile the vertex shader
-    if (!compileShader_(GL_VERTEX_SHADER_ARB, "vertex shader", vertSource_))
+    if (!compileShader_(GL_VERTEX_SHADER, "vertex shader", vertSource_))
     {
         return false;
     }
 
     // compile the fragment shader
-    if (!compileShader_(GL_FRAGMENT_SHADER_ARB, "fragment shader", fragSource_))
+    if (!compileShader_(GL_FRAGMENT_SHADER, "fragment shader", fragSource_))
         return false;
 
     // link program object
-    SCH_CHECK_GL( glLinkProgramARB(shader_) );
+    SCH_CHECK_GL( glLinkProgram(shader_) );
 
     GLint linked;
     SCH_CHECK_GL( glGetProgramiv(shader_, GL_LINK_STATUS, &linked) );
@@ -130,7 +131,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
         return false;
 
     int shadername;
-    SCH_CHECK_GL( shadername = glCreateShaderObjectARB(type) );
+    SCH_CHECK_GL( shadername = glCreateShader(type) );
     if (!glIsShader(shadername))
     {
         log_ += "error creating " + typeName + " ShaderObject\n";
@@ -151,7 +152,7 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     // attach source
     SCH_CHECK_GL( glShaderSource(shadername, 1, psrc, 0) );
     // compile
-    SCH_CHECK_GL( glCompileShaderARB(shadername) );
+    SCH_CHECK_GL( glCompileShader(shadername) );
 
     // check compile status
     bool compiled = false;
@@ -160,7 +161,6 @@ bool Glsl::compileShader_(GLenum type, const QString& typeName, const QString &s
     if (!cc)
     {
         log_ += typeName + " compile ERROR\n";
-        //MO_CHECK_GL( glGetShaderiv(shadername, GL_SHADER_SOURCE_LENGTH, &cc); )
     }
     else
     {
@@ -220,7 +220,11 @@ void Glsl::getUniforms_()
 
     // get max length of variable names
     GLint labelLength;
+#ifndef GL_MAX_LABEL_LENGTH
+    labelLength = 256;
+#else
     SCH_CHECK_GL( glGetIntegerv(GL_MAX_LABEL_LENGTH, &labelLength) );
+#endif
 
     // get each uniform data
     for (int i=0; i<numu; ++i)
