@@ -83,9 +83,49 @@ void AppSettings::createDefaultValues_()
     defaultValues_.insert("RenderSettings/doCullFace", true);
     defaultValues_.insert("RenderSettings/doFrontFaceCCW", true);
     defaultValues_.insert("RenderSettings/doDrawCoords", true);
+
+    defaultValues_.insert("ShaderAttributes/position",  "a_position");
+    defaultValues_.insert("ShaderAttributes/color",     "a_color");
+    defaultValues_.insert("ShaderAttributes/normal",    "a_normal");
+    defaultValues_.insert("ShaderUniforms/projection",  "u_projection");
+    defaultValues_.insert("ShaderUniforms/view",        "u_view");
+    defaultValues_.insert("ShaderUniforms/time",        "u_time");
+    defaultValues_.insert("ShaderUniforms/aspect",      "u_aspect");
+
+    // install them if not present already
+    auto keys = defaultValues_.keys();
+    for (int i=0; i<keys.size(); ++i)
+    {
+        if (!contains(keys[i]))
+            setValue(keys[i], defaultValues_[keys[i]]);
+    }
 }
 
+QStringList AppSettings::getShaderAttributes()
+{
+    beginGroup("ShaderAttributes");
+    QStringList keys = childKeys();
+    endGroup();
 
+    QStringList values;
+    for (auto &k : keys)
+        values << getValue("ShaderAttributes/"+k).toString();
+
+    return values;
+}
+
+QStringList AppSettings::getShaderUniforms()
+{
+    beginGroup("ShaderUniforms");
+    QStringList keys = childKeys();
+    endGroup();
+
+    QStringList values;
+    for (auto &k : keys)
+        values << getValue("ShaderUniforms/"+k).toString();
+
+    return values;
+}
 
 QVariant AppSettings::getValue(const QString &key) const
 {

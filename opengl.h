@@ -55,7 +55,8 @@ struct ShaderLocations
     GLuint
         projection,
         view,
-        time;
+        time,
+        aspect;
 };
 
 

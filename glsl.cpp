@@ -19,8 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QDebug>
+#include <QStringList>
+
 #include "glsl.h"
 #include "debug.h"
+#include "appsettings.h"
 
 void privateUniformDeleter(Uniform * u) { delete u; }
 
@@ -48,12 +51,6 @@ Glsl::Glsl()
         ready_          (false),
         activated_      (false)
 {
-    attribNamePosition_ = "a_position";
-    attribNameNormal_ = "a_normal";
-    attribNameColor_ = "a_color";
-    uniformNameProjection_ = "u_projection";
-    uniformNameView_ = "u_view";
-    uniformNameTime_ = "u_time";
 }
 
 
@@ -116,7 +113,7 @@ bool Glsl::compile()
         return false;
     }
 
-    getAttributes_();
+    getSpecialLocations_();
     getUniforms_();
 
     // keep copy of previous uniforms
@@ -206,14 +203,22 @@ void Glsl::deactivate()
     activated_ = false;
 }
 
-void Glsl::getAttributes_()
+void Glsl::getSpecialLocations_()
 {
-    SCH_CHECK_GL( attribs_.position = glGetAttribLocation(shader_, attribNamePosition_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribs_.normal = glGetAttribLocation(shader_, attribNameNormal_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribs_.color = glGetAttribLocation(shader_, attribNameColor_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribs_.projection = glGetUniformLocation(shader_, uniformNameProjection_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribs_.view = glGetUniformLocation(shader_, uniformNameView_.toStdString().c_str()) );
-    SCH_CHECK_GL( attribs_.time = glGetUniformLocation(shader_, uniformNameTime_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.position = glGetAttribLocation(shader_,
+                    appSettings->getValue("ShaderAttributes/position").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.normal = glGetAttribLocation(shader_,
+                    appSettings->getValue("ShaderAttributes/normal").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.color = glGetAttribLocation(shader_,
+                    appSettings->getValue("ShaderAttributes/color").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.projection = glGetUniformLocation(shader_,
+                    appSettings->getValue("ShaderUniforms/projection").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.view = glGetUniformLocation(shader_,
+                    appSettings->getValue("ShaderUniforms/view").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.time = glGetUniformLocation(shader_,
+                    appSettings->getValue("ShaderUniforms/time").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.aspect = glGetUniformLocation(shader_,
+                    appSettings->getValue("ShaderUniforms/aspect").toString().toStdString().c_str()) );
 }
 
 void Glsl::getUniforms_()
@@ -230,6 +235,9 @@ void Glsl::getUniforms_()
     SCH_CHECK_GL( glGetIntegerv(GL_MAX_LABEL_LENGTH, &labelLength) );
 #endif
 
+    // don't expose these to user
+    QStringList specialUniforms = appSettings->getShaderUniforms();
+
     // get each uniform data
     for (int i=0; i<numu; ++i)
     {
@@ -245,6 +253,13 @@ void Glsl::getUniforms_()
             );
         name.resize(length);
         u->name_ = QString(&name[0]);
+
+        // check for special uniforms
+        if (specialUniforms.contains(u->name_))
+        {
+            delete u;
+            continue;
+        }
 
         // keep in list
         uniforms_.push_back(std::shared_ptr<Uniform>(u, privateUniformDeleter));

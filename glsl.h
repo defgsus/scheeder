@@ -143,8 +143,8 @@ public:
 
 private:
 
-    /** Gets the standardized attributes. */
-    void getAttributes_();
+    /** Gets the standardized attributes and uniforms. */
+    void getSpecialLocations_();
 
     /** Gets all used uniforms and populates the uniforms_ list */
     void getUniforms_();
@@ -168,13 +168,6 @@ private:
 
     ShaderLocations attribs_;
 
-    QString
-          attribNamePosition_,
-          attribNameNormal_,
-          attribNameColor_,
-          uniformNameProjection_,
-          uniformNameView_,
-          uniformNameTime_;
 };
 
 #endif // GLSL_H

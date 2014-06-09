@@ -54,6 +54,12 @@ public:
     /** Tries to restore a layout of a widget */
     void getLayout(QWidget *);
 
+    /** Return a list of strings of the names of vertex attributes */
+    QStringList getShaderAttributes();
+
+    /** Return a list of strings of the names of shader uniforms */
+    QStringList getShaderUniforms();
+
 signals:
 
 public slots:

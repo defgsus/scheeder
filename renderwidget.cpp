@@ -190,6 +190,12 @@ void RenderWidget::sendSpecialUniforms_()
         SCH_CHECK_GL( glUniform1f(
                           shader_->getShaderLocations().time, getTime()) );
     }
+    if ((int)shader_->getShaderLocations().aspect>=0)
+    {
+        SCH_CHECK_GL( glUniform1f(
+                          shader_->getShaderLocations().aspect,
+                          (float)width() / height()) );
+    }
 }
 
 void RenderWidget::startAnimation()
