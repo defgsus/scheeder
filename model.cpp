@@ -187,12 +187,20 @@ void Model::draw()
     initQtOpenGl_();
 #endif
 
+#ifdef __APPLE__
+    SCH_CHECK_GL( glBindVertexArrayAPPLE(vao_) );
+#elif
     SCH_CHECK_GL( glBindVertexArray(vao_) );
+#endif
 
     //SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
     SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
 
+#ifdef __APPLE__
+    SCH_CHECK_GL( glBindVertexArrayAPPLE(0) );
+#elif
     SCH_CHECK_GL( glBindVertexArray(0) );
+#endif
 }
 
 void Model::drawOldschool()
@@ -223,11 +231,19 @@ void Model::releaseGL()
     initQtOpenGl_();
 #endif
 
+#ifdef __APPLE__
+    if (glIsVertexArrayAPPLE(vao_))
+    {
+        SCH_CHECK_GL( glDeleteVertexArraysAPPLE(1, &vao_) );
+        SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
+    }
+#elif
     if (glIsVertexArray(vao_))
     {
         SCH_CHECK_GL( glDeleteVertexArrays(1, &vao_) );
         SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
     }
+#endif
     isVAO_ = false;
 }
 
@@ -241,9 +257,17 @@ void Model::createVAO_()
     releaseGL();
 
     // create the object
+#ifdef __APPLE__
+    SCH_CHECK_GL( glGenVertexArraysAPPLE(1, &vao_) );
+#elif
     SCH_CHECK_GL( glGenVertexArrays(1, &vao_) );
+#endif
     // and bind it
+#ifdef __APPLE__
+    SCH_CHECK_GL( glBindVertexArrayAPPLE(vao_) );
+#elif
     SCH_CHECK_GL( glBindVertexArray(vao_) );
+#endif
 
     // create buffers for vertex/color/normal
 
