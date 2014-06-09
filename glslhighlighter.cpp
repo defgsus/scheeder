@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "glslhighlighter.h"
+#include "appsettings.h"
 
 /* Following are the keywords and variable names of GLSL.
  * TODO: Would be great to divide them into different GLSL versions.
@@ -186,7 +187,8 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
         keywordFormat,
         reservedKeywordFormat,
         functionFormat,
-        variableFormat;
+        variableFormat,
+        specificVariableFormat;
 
     // -- styles for each category --
 
@@ -202,6 +204,9 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
     // built-in variables
     variableFormat.setFontWeight(QFont::Bold);
     variableFormat.setForeground(QBrush(QColor(200,220,200)));
+    // application-specific variables
+    specificVariableFormat.setFontWeight(QFont::Bold);
+    specificVariableFormat.setForeground(QBrush(QColor(200,220,220)));
     // comments
     commentFormat_.setForeground(QBrush(QColor(140,140,140)));
 
@@ -242,6 +247,17 @@ GlslHighlighter::GlslHighlighter(QTextDocument *parent)
     {
         rule.pattern = QRegExp( "\\b" + glsl_variables[i] + "\\b" );
         rule.format = variableFormat;
+        rules_.append(rule);
+    }
+
+    // setup app-specific variables
+
+    auto vars = appSettings->getShaderAttributes();
+    vars += appSettings->getShaderUniforms();
+    for (auto &v : vars)
+    {
+        rule.pattern = QRegExp( "\\b" + v + "\\b" );
+        rule.format = specificVariableFormat;
         rules_.append(rule);
     }
 
