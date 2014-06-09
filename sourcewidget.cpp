@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QFile>
 #include <QTextStream>
+#include <QFont>
 #include <QDebug>
 
 #include "sourcewidget.h"
@@ -29,7 +30,7 @@ SourceWidget::SourceWidget(QWidget *parent) :
     QTextEdit   (parent),
     modified_   (false)
 {
-    // set default colors
+    // --- set default colors ---
 
     QPalette pal = palette();
 
@@ -37,6 +38,13 @@ SourceWidget::SourceWidget(QWidget *parent) :
     pal.setColor(QPalette::Text, QColor(200,200,200));
 
     setPalette(pal);
+
+    // --- setup font ---
+
+    QFont f("Monospace");
+    f.setStyleHint(QFont::Monospace);
+    setFont(f);
+    setTabStopWidth(QFontMetrics(font()).width("    "));
 
     // attach syntax highlighter
     highlighter_ = new GlslHighlighter(document());

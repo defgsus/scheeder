@@ -125,11 +125,25 @@ void MainWindow::createWidgets_()
 
 void MainWindow::createMainMenu_()
 {
+    QAction * a;
+
     // --- file menu ---
     QMenu * m = new QMenu(tr("&File"), this);
-    QAction * a = new QAction(tr("&Exit"), this);
+    menuBar()->addMenu(m);
+    a = new QAction(tr("&Load all"), this);
+    a->setShortcut(Qt::CTRL + Qt::Key_L);
     m->addAction(a);
-    connect(a, SIGNAL(triggered()), this, SLOT(close()));
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
+    a = new QAction(tr("Load v&ertex source"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadVertexShader()));
+    a = new QAction(tr("Load f&ragment source"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
+    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadFragmentShader()));
+
     m->addSeparator();
     saveAll_ = a = new QAction(tr("&Save all"), this);
     a->setShortcut(Qt::CTRL + Qt::Key_S);
@@ -149,25 +163,15 @@ void MainWindow::createMainMenu_()
     m->addAction(a);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveFragmentShaderAs()));
-    m->addSeparator();
-    a = new QAction(tr("&Load all"), this);
-    a->setShortcut(Qt::CTRL + Qt::Key_L);
-    m->addAction(a);
-    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
-    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
-    a = new QAction(tr("Load v&ertex source"), this);
-    m->addAction(a);
-    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
-    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadVertexShader()));
-    a = new QAction(tr("Load f&ragment source"), this);
-    m->addAction(a);
-    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
-    connect(a, SIGNAL(triggered()), this, SLOT(slotLoadFragmentShader()));
 
-    menuBar()->addMenu(m);
+    m->addSeparator();
+    a = new QAction(tr("&Exit"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(close()));
 
     // --- model menu ---
     m = new QMenu(tr("&Model"), this);
+    menuBar()->addMenu(m);
 
     // create a group to make only one model checkable at a time
     auto group = new QActionGroup(this);
@@ -192,12 +196,11 @@ void MainWindow::createMainMenu_()
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(slotCreateModel()));
 
-    menuBar()->addMenu(m);
-
 
     // --- shader menu ---
 
     m = new QMenu(tr("&Shader"), this);
+    menuBar()->addMenu(m);
     a = new QAction(tr("&Compile"), this);
     a->setShortcut(Qt::ALT + Qt::Key_C);
     m->addAction(a);
@@ -214,25 +217,27 @@ void MainWindow::createMainMenu_()
         appSettings->setValue("auto_compile", check);
     });
 
-    menuBar()->addMenu(m);
 
     // --- options menu ---
     m = new QMenu(tr("&Options"), this);
+    menuBar()->addMenu(m);
+#ifndef SCH_USE_QT_OPENGLFUNC
     m->addAction(createRenderOptionAction_("doDrawCoords", "draw coordinates"));
+#endif
     m->addAction(createRenderOptionAction_("doDepthTest", "depth test"));
     m->addAction(createRenderOptionAction_("doCullFace", "cull faces"));
     m->addAction(createRenderOptionAction_("doFrontFaceCCW", "front is counter-clockwise"));
 
+
+    // --- animation menu ---
+    m = new QMenu(tr("&Animation"), this);
     menuBar()->addMenu(m);
-
-    // --- toolbar ---
-
     startAnim_ = a = new QAction(tr("start animation"), this);
-    ui_->mainToolBar->addAction(a);
+    m->addAction(a);
     a->setShortcut(Qt::Key_F7);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(startAnimation()));
     stopAnim_ = a = new QAction(tr("stop animation"), this);
-    ui_->mainToolBar->addAction(a);
+    m->addAction(a);
     a->setShortcut(Qt::Key_F8);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
 
