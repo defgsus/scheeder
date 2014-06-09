@@ -200,6 +200,7 @@ void RenderWidget::sendSpecialUniforms_()
                           shader_->getShaderLocations().aspect,
                           (float)width() / height()) );
     }
+
 }
 
 void RenderWidget::startAnimation()

@@ -72,8 +72,6 @@ void Glsl::setFragmentSource(const QString &text)
 
 bool Glsl::compile()
 {
-    // temporarily save uniforms
-//    auto unicopy = uniforms_;
 
 #ifdef SCH_USE_QT_OPENGLFUNC
     if (!isGlFuncInitialized_)
@@ -121,8 +119,22 @@ bool Glsl::compile()
     {
         log_ += "shader programm link error\n";
         shader_ = -1;
-        return false;
     }
+
+    // print linker log
+    GLint blen = 0;
+    GLsizei slen = 0;
+    SCH_CHECK_GL( glGetProgramiv(shader_, GL_INFO_LOG_LENGTH , &blen) );
+    if (blen > 1)
+    {
+        std::vector<GLchar> compiler_log(blen+1);
+        SCH_CHECK_GL( glGetProgramInfoLog(shader_, blen, &slen, &compiler_log[0]) );
+        log_ += "linker log:\n" + QString(&compiler_log[0]) + "\n";
+    }
+
+
+    if (!linked)
+        return false;
 
     getSpecialLocations_();
     getUniforms_();
@@ -250,8 +262,6 @@ void Glsl::getUniforms_()
     {
         Uniform * u = new Uniform;
 
-        u->location_ = i;
-
         // plain old char* strings always need a bit of extra code ..
         GLsizei length;
         std::vector<GLchar> name(labelLength);
@@ -261,12 +271,15 @@ void Glsl::getUniforms_()
         name.resize(length);
         u->name_ = QString(&name[0]);
 
-        // check for special uniforms
+        // discard for special uniforms from the user-interface
         if (specialUniforms.contains(u->name_))
         {
             delete u;
             continue;
         }
+
+        // find location of uniform
+        SCH_CHECK_GL( u->location_ = glGetUniformLocation(shader_, &name[0]) );
 
         // keep in list
         uniforms_.push_back(std::shared_ptr<Uniform>(u, privateUniformDeleter));
@@ -292,6 +305,7 @@ void Glsl::sendUniform(const Uniform * u)
         SCH_CHECK_GL( glUniform2f(u->location_, u->floats[0], u->floats[1]) );
     break;
     case GL_FLOAT_VEC3:
+//        qDebug() << activated_ << u->location_ << u->floats[0] << u->floats[1] << u->floats[2];
         SCH_CHECK_GL( glUniform3f(u->location_, u->floats[0], u->floats[1], u->floats[2]) );
     break;
     case GL_FLOAT_VEC4:

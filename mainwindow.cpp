@@ -155,11 +155,11 @@ void MainWindow::createMainMenu_()
     m->addAction(a);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
-    a = new QAction(tr("Load v&ertex source as ..."), this);
+    a = new QAction(tr("Load v&ertex source"), this);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadVertexShader()));
-    a = new QAction(tr("Load f&ragment source as ..."), this);
+    a = new QAction(tr("Load f&ragment source"), this);
     m->addAction(a);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadFragmentShader()));
@@ -229,9 +229,11 @@ void MainWindow::createMainMenu_()
 
     startAnim_ = a = new QAction(tr("start animation"), this);
     ui_->mainToolBar->addAction(a);
+    a->setShortcut(Qt::Key_F7);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(startAnimation()));
     stopAnim_ = a = new QAction(tr("stop animation"), this);
     ui_->mainToolBar->addAction(a);
+    a->setShortcut(Qt::Key_F8);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
 
 }
