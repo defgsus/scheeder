@@ -36,6 +36,9 @@ public:
                           const QGLFormat& format = QGLFormat());
     ~RenderWidget();
 
+    /** Return current animation time in seconds. */
+    float getTime() const;
+
 signals:
 
     /** Emitted when shader was compiled after source-change,
@@ -58,6 +61,12 @@ public slots:
     /** Please compile the shader in next paintGL() */
     void requestCompileShader();
 
+    /** Starts continuiosly rerendering the scene. */
+    void startAnimation();
+
+    /** Stops rerendering the scene all over. */
+    void stopAnimation() { doAnimation_ = false; }
+
 protected:
 
     virtual void paintGL();
@@ -65,12 +74,18 @@ protected:
     /** Sets the OpenGL state to the current set options */
     void applyOptions_();
 
+    /** Send specific uniform values (like projection matrix...) */
+    void sendSpecialUniforms_();
+
 private:
 
     Model * model_, * newModel_;
     Glsl * shader_, * newShader_;
 
-    bool requestCompile_;
+    bool requestCompile_,
+         doAnimation_;
+
+    QTime timer_;
 
     // options
     bool doDepthTest_,

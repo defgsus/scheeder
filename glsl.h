@@ -173,7 +173,8 @@ private:
           attribNameNormal_,
           attribNameColor_,
           uniformNameProjection_,
-          uniformNameView_;
+          uniformNameView_,
+          uniformNameTime_;
 };
 
 #endif // GLSL_H

@@ -130,30 +130,37 @@ void MainWindow::createMainMenu_()
     m->addAction(a);
     connect(a, SIGNAL(triggered()), this, SLOT(close()));
     m->addSeparator();
-    a = new QAction(tr("&Save all"), this);
+    saveAll_ = a = new QAction(tr("&Save all"), this);
     a->setShortcut(Qt::CTRL + Qt::Key_S);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShader()));
     a = new QAction(tr("&Save all as ..."), this);
     a->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveShaderAs()));
     a = new QAction(tr("Save &vertex source as ..."), this);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveVertexShaderAs()));
     a = new QAction(tr("Save &fragment source as ..."), this);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotSaveFragmentShaderAs()));
     m->addSeparator();
     a = new QAction(tr("&Load all"), this);
     a->setShortcut(Qt::CTRL + Qt::Key_L);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadShader()));
     a = new QAction(tr("Load v&ertex source as ..."), this);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadVertexShader()));
     a = new QAction(tr("Load f&ragment source as ..."), this);
     m->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
     connect(a, SIGNAL(triggered()), this, SLOT(slotLoadFragmentShader()));
 
     menuBar()->addMenu(m);
@@ -215,8 +222,16 @@ void MainWindow::createMainMenu_()
     m->addAction(createRenderOptionAction_("doCullFace", "cull faces"));
     m->addAction(createRenderOptionAction_("doFrontFaceCCW", "front is counter-clockwise"));
 
-
     menuBar()->addMenu(m);
+
+    // --- toolbar ---
+
+    startAnim_ = a = new QAction(tr("start animation"), this);
+    ui_->mainToolBar->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(startAnimation()));
+    stopAnim_ = a = new QAction(tr("stop animation"), this);
+    ui_->mainToolBar->addAction(a);
+    connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
 
 }
 
@@ -320,6 +335,7 @@ void MainWindow::deleteUniformWidgets_()
 
 void MainWindow::slotSourceChanged()
 {
+    updateSourceTitles_();
     if (doAutoCompile_->isChecked())
         compileShader();
 }
@@ -329,6 +345,8 @@ void MainWindow::compileShader()
     // disconnect uniform updates
     disconnect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
                     this, SLOT(slotUniformChanged(Uniform*)));
+    // gray-out uniform editor
+    uniEdit_->setEnabled(false);
 
     shader_->setVertexSource(editVert_->toPlainText());
     shader_->setFragmentSource(editFrag_->toPlainText());
@@ -347,6 +365,7 @@ void MainWindow::slotShaderCompiled()
         updateUniformWidgets_();
         connect(uniFactory_, SIGNAL(uniformChanged(Uniform*)),
                         this, SLOT(slotUniformChanged(Uniform*)));
+        uniEdit_->setEnabled(true);
     }
 }
 
@@ -492,6 +511,9 @@ bool MainWindow::slotSaveFragmentShaderAs()
 
 void MainWindow::updateSourceTitles_()
 {
+    // enable save all only when source is modified
+    saveAll_->setEnabled(editVert_->modified() || editFrag_->modified());
+
     QString title = tr("vertex source");
     if (editVert_->modified())
         title += " *";

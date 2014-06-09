@@ -102,7 +102,10 @@ private:
 
     Glsl * shader_;
 
-    QAction * doAutoCompile_,
+    QAction * startAnim_,
+            * stopAnim_,
+            * saveAll_,
+            * doAutoCompile_,
             * doGroupVertices_,
             * modelBox_,
             * modelSphere_,

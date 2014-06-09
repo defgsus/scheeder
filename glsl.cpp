@@ -53,6 +53,7 @@ Glsl::Glsl()
     attribNameColor_ = "a_color";
     uniformNameProjection_ = "u_projection";
     uniformNameView_ = "u_view";
+    uniformNameTime_ = "u_time";
 }
 
 
@@ -198,7 +199,9 @@ void Glsl::activate()
 
 void Glsl::deactivate()
 {
-    // TODO
+    // TODO:
+    // On OSX this gives GL_INVALID_OPERATION
+    // although the spec says that's the way
     SCH_CHECK_GL( glUseProgram(0) );
     activated_ = false;
 }
@@ -210,6 +213,7 @@ void Glsl::getAttributes_()
     SCH_CHECK_GL( attribs_.color = glGetAttribLocation(shader_, attribNameColor_.toStdString().c_str()) );
     SCH_CHECK_GL( attribs_.projection = glGetUniformLocation(shader_, uniformNameProjection_.toStdString().c_str()) );
     SCH_CHECK_GL( attribs_.view = glGetUniformLocation(shader_, uniformNameView_.toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.time = glGetUniformLocation(shader_, uniformNameTime_.toStdString().c_str()) );
 }
 
 void Glsl::getUniforms_()

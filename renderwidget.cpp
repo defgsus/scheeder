@@ -35,7 +35,8 @@ RenderWidget::RenderWidget(QWidget *parent,
     newModel_       (0),
     shader_         (0),
     newShader_      (0),
-    requestCompile_ (false)
+    requestCompile_ (false),
+    doAnimation_    (false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(256,256);
@@ -70,7 +71,6 @@ void RenderWidget::setModel(Model * m)
 void RenderWidget::setShader(Glsl *s)
 {
     newShader_ = s;
-
     update();
 }
 
@@ -141,14 +141,12 @@ void RenderWidget::paintGL()
         }
 
         // activate shader and update uniform values
-        shader_->activate();
-        shader_->sendUniforms();
-        glUniformMatrix4fv(
-            shader_->getShaderLocations().projection,
-            1, GL_FALSE, glm::value_ptr(projectionMatrix()));
-        glUniformMatrix4fv(
-            shader_->getShaderLocations().view,
-            1, GL_FALSE, glm::value_ptr(transformationMatrix()));
+        if (shader_->ready())
+        {
+            shader_->activate();
+            shader_->sendUniforms();
+            sendSpecialUniforms_();
+        }
     }
 
     if (model_)
@@ -164,8 +162,46 @@ void RenderWidget::paintGL()
             model_->drawOldschool();
     }
 
-    if (shader_)
+    if (shader_ && shader_->activated())
         shader_->deactivate();
+
+
+    // render again!
+    if (doAnimation_)
+        update();
+}
+
+void RenderWidget::sendSpecialUniforms_()
+{
+    if ((int)shader_->getShaderLocations().projection>=0)
+    {
+        SCH_CHECK_GL( glUniformMatrix4fv(
+                        shader_->getShaderLocations().projection,
+                        1, GL_FALSE, glm::value_ptr(projectionMatrix())) );
+    }
+    if ((int)shader_->getShaderLocations().view>=0)
+    {
+        SCH_CHECK_GL( glUniformMatrix4fv(
+                        shader_->getShaderLocations().view,
+                        1, GL_FALSE, glm::value_ptr(transformationMatrix())) );
+    }
+    if ((int)shader_->getShaderLocations().time>=0)
+    {
+        SCH_CHECK_GL( glUniform1f(
+                          shader_->getShaderLocations().time, getTime()) );
+    }
+}
+
+void RenderWidget::startAnimation()
+{
+    doAnimation_ = true;
+    timer_.start();
+    update();
+}
+
+float RenderWidget::getTime() const
+{
+    return (float)timer_.elapsed() / 1000.f;
 }
 
 void RenderWidget::applyOptions_()

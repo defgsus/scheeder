@@ -17,7 +17,7 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-
+#include <QDebug>
 #include "model.h"
 #include "vector.h"
 #include "debug.h"
@@ -97,7 +97,6 @@ void Model::drawOldschool() const
     SCH_CHECK_GL( glNormalPointer(NormalEnum, 0, &normal_[0]) );
     SCH_CHECK_GL( glColorPointer(4, ColorEnum,  0, &color_[0]) );
 
-    //glDrawArrays(GL_LINES, 0, vertex_.size()/3);
     SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
 
     SCH_CHECK_GL( glDisableClientState(GL_VERTEX_ARRAY) );
@@ -227,20 +226,29 @@ void Model::createVAO_()
 
     SCH_CHECK_GL( glGenBuffers(3, buffers_) );
 
-    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[0]) );
-    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, vertex_.size() * sizeof(VertexType), &vertex_[0], GL_STATIC_DRAW) );
-    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.position) );
-    SCH_CHECK_GL( glVertexAttribPointer(attribs_.position, 3, VertexEnum, GL_FALSE, 0, NULL) );
+    if ((int)attribs_.position>=0)
+    {
+        SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[0]) );
+        SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, vertex_.size() * sizeof(VertexType), &vertex_[0], GL_STATIC_DRAW) );
+        SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.position) );
+        SCH_CHECK_GL( glVertexAttribPointer(attribs_.position, 3, VertexEnum, GL_FALSE, 0, NULL) );
+    }
 
-    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[1]) );
-    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, normal_.size() * sizeof(NormalType), &normal_[0], GL_STATIC_DRAW) );
-    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.normal) );
-    SCH_CHECK_GL( glVertexAttribPointer(attribs_.normal, 3, NormalEnum, GL_FALSE, 0, NULL) );
+    if ((int)attribs_.normal>=0)
+    {
+        SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[1]) );
+        SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, normal_.size() * sizeof(NormalType), &normal_[0], GL_STATIC_DRAW) );
+        SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.normal) );
+        SCH_CHECK_GL( glVertexAttribPointer(attribs_.normal, 3, NormalEnum, GL_FALSE, 0, NULL) );
+    }
 
-    SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[2]) );
-    SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, color_.size() * sizeof(ColorType), &color_[0], GL_STATIC_DRAW) );
-    SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.color) );
-    SCH_CHECK_GL( glVertexAttribPointer(attribs_.color, 4, ColorEnum, GL_FALSE, 0, NULL) );
+    if ((int)attribs_.color>=0)
+    {
+        SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[2]) );
+        SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, color_.size() * sizeof(ColorType), &color_[0], GL_STATIC_DRAW) );
+        SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.color) );
+        SCH_CHECK_GL( glVertexAttribPointer(attribs_.color, 4, ColorEnum, GL_FALSE, 0, NULL) );
+    }
 
     isVAO_ = true;
 }
