@@ -159,7 +159,6 @@ void Model::calculateTriangleNormals()
 
 void Model::unIndex()
 {
-    qDebug() << "unindex";
     auto vertex = vertex_;
     auto normal = normal_;
     auto color = color_;
@@ -190,8 +189,7 @@ void Model::unIndex()
         addTriangle(t1, t2, t3);
     }
 
-qDebug() << "unindex end";
-    //calculateTriangleNormals();
+    calculateTriangleNormals();
 }
 
 

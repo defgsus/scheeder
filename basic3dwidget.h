@@ -49,7 +49,8 @@ class Basic3DWidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    explicit Basic3DWidget(QWidget *parent = 0);
+    explicit Basic3DWidget(QWidget *parent = 0,
+                           const QGLFormat& format = QGLFormat());
 
     /** Returns the current projection matrix */
     const Mat4& projectionMatrix() const { return projectionMatrix_; }

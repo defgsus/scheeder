@@ -138,6 +138,9 @@ public:
         @note The shader must be activated. */
     void sendUniforms();
 
+    /** Releases GPU resources. */
+    void releaseGL();
+
 private:
 
     /** Gets the standardized attributes. */

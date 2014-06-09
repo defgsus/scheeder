@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "basic3dwidget.h"
 
-Basic3DWidget::Basic3DWidget(QWidget *parent) :
-    QGLWidget(parent)
+Basic3DWidget::Basic3DWidget(QWidget *parent, const QGLFormat& f) :
+    QGLWidget(f, parent)
 {
     viewInit();
 }
@@ -98,13 +98,16 @@ void Basic3DWidget::resizeGL(int w, int h)
     // set the viewport to the widget's size
     glViewport(0,0,w,h);
 
+    /*
     // set the projection matrix
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(projectionMatrix_));
+    glLoadIdentity();
+    //glLoadMatrixf(glm::value_ptr(projectionMatrix_));
     // initialize the transformation matrix
     // (although this is overwritten in paintGL();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    */
 }
 
 

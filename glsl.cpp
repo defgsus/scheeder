@@ -51,8 +51,8 @@ Glsl::Glsl()
     attribNamePosition_ = "a_position";
     attribNameNormal_ = "a_normal";
     attribNameColor_ = "a_color";
-    uniformNameProjection_ = "a_projection";
-    uniformNameView_ = "a_view";
+    uniformNameProjection_ = "u_projection";
+    uniformNameView_ = "u_view";
 }
 
 
@@ -280,4 +280,10 @@ void Glsl::sendUniforms()
 {
     for (size_t i=0; i<numUniforms(); ++i)
         sendUniform(getUniform(i));
+}
+
+void Glsl::releaseGL()
+{
+    SCH_CHECK_GL( glDeleteProgram(shader_) );
+    ready_ = activated_ = false;
 }

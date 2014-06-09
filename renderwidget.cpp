@@ -28,11 +28,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "debug.h"
 
 
-RenderWidget::RenderWidget(QWidget *parent) :
-    Basic3DWidget   (parent),
+RenderWidget::RenderWidget(QWidget *parent,
+                           const QGLFormat& format) :
+    Basic3DWidget   (parent, format),
     model_          (0),
     newModel_       (0),
     shader_         (0),
+    newShader_      (0),
     requestCompile_ (false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -68,10 +70,7 @@ void RenderWidget::setModel(Model * m)
 
 void RenderWidget::setShader(Glsl *s)
 {
-    if (shader_)
-        delete shader_;
-
-    shader_ = s;
+    newShader_ = s;
 
     update();
 }
@@ -86,7 +85,10 @@ void RenderWidget::paintGL()
 {
     applyOptions_();
 
-    Basic3DWidget::paintGL();
+    // clear screen
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //Basic3DWidget::paintGL();
 
     if (doDrawCoords_)
         drawCoords_(10);
@@ -107,6 +109,21 @@ void RenderWidget::paintGL()
         newModel_ = 0;
         // we need to tell the model the attribute locations
         sendAttributes = true;
+    }
+
+    // replace shader
+    if (newShader_)
+    {
+        // remove old resources
+        if (shader_)
+        {
+            if (shader_->ready())
+                shader_->releaseGL();
+            delete shader_;
+        }
+        // exchange
+        shader_ = newShader_;
+        newShader_ = 0;
     }
 
     if (shader_)

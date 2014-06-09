@@ -79,7 +79,9 @@ void MainWindow::createWidgets_()
     ui_->setupUi(this);
 
     // render window
-    renderer_ = new RenderWidget(this);
+    QGLFormat glformat;
+    glformat.setVersion(3,2);
+    renderer_ = new RenderWidget(this, glformat);
     renderer_->setShader(shader_);
     connect(renderer_, SIGNAL(shaderCompiled()), this, SLOT(slotShaderCompiled()));
     auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));

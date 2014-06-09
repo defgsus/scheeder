@@ -32,7 +32,8 @@ class RenderWidget : public Basic3DWidget
 {
     Q_OBJECT
 public:
-    explicit RenderWidget(QWidget *parent = 0);
+    explicit RenderWidget(QWidget *parent = 0,
+                          const QGLFormat& format = QGLFormat());
     ~RenderWidget();
 
 signals:
@@ -67,7 +68,7 @@ protected:
 private:
 
     Model * model_, * newModel_;
-    Glsl * shader_;
+    Glsl * shader_, * newShader_;
 
     bool requestCompile_;
 
