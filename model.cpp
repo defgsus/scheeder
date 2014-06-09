@@ -17,7 +17,7 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-#include <QDebug>
+
 #include "model.h"
 #include "vector.h"
 #include "debug.h"
@@ -280,10 +280,8 @@ void Model::createVAO_()
 #ifdef SCH_USE_QT_OPENGLFUNC
 void Model::initQtOpenGl_()
 {
-    qDebug() << "initializing opengl functions check";
     if (!isGlFuncInitialized_)
     {
-        qDebug() << "initializing opengl functions";
         initializeOpenGLFunctions();
         isGlFuncInitialized_ = true;
     }

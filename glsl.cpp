@@ -209,7 +209,7 @@ void Glsl::deactivate()
 {
     // TODO:
     // On OSX this gives GL_INVALID_OPERATION
-    // although the spec says that's the way
+    // although the spec says that's the way to do it
     SCH_CHECK_GL( glUseProgram(0) );
     activated_ = false;
 }
@@ -240,11 +240,7 @@ void Glsl::getUniforms_()
 
     // get max length of variable names
     GLint labelLength;
-#ifndef GL_MAX_LABEL_LENGTH
-    labelLength = 256;
-#else
-    SCH_CHECK_GL( glGetIntegerv(GL_MAX_LABEL_LENGTH, &labelLength) );
-#endif
+    SCH_CHECK_GL( glGetProgramiv(shader_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &labelLength) );
 
     // don't expose these to user
     QStringList specialUniforms = appSettings->getShaderUniforms();

@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QMouseEvent>
 
 #include "basic3dwidget.h"
+#include "debug.h"
 
 Basic3DWidget::Basic3DWidget(QWidget *parent, const QGLFormat& f) :
     QGLWidget(f, parent)
@@ -98,6 +99,8 @@ void Basic3DWidget::resizeGL(int w, int h)
     // set the viewport to the widget's size
     glViewport(0,0,w,h);
 
+
+#ifndef SCH_USE_QT_OPENGLFUNC
     // set the projection matrix
     /* NOTE: This is pretty much openGL v1-2 stuff.
      * In later versions projection and view matrices are
@@ -111,16 +114,19 @@ void Basic3DWidget::resizeGL(int w, int h)
     // (although this is overwritten in paintGL();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+#endif
 }
 
 
 void Basic3DWidget::paintGL()
 {
+#ifndef SCH_USE_QT_OPENGLFUNC
     // setup transformation matrix
-    glLoadMatrixf(glm::value_ptr(transformationMatrix()));
+    SCH_CHECK_GL( glLoadMatrixf(glm::value_ptr(transformationMatrix())) );
+#endif
 
     // clear screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    SCH_CHECK_GL( glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) );
 }
 
 

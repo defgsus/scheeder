@@ -82,6 +82,8 @@ void RenderWidget::requestCompileShader()
 
 void RenderWidget::paintGL()
 {
+    //glGetError(); /* clear previous errors */
+
     applyOptions_();
 
     // clear screen
@@ -89,8 +91,10 @@ void RenderWidget::paintGL()
 
     Basic3DWidget::paintGL();
 
+#ifndef SCH_USE_QT_OPENGLFUNC
     if (doDrawCoords_)
         drawCoords_(10);
+#endif
 
     bool sendAttributes = false;
 
