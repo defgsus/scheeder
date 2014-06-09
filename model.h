@@ -27,8 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
 
-/** Abstraction around GL-arrays.
+/** Container for geometry data and abstraction around GL-arrays.
 
+    This Model is quite custom and less generic.
+    It only renders triangles. It will create a vertex-array-object
+    from the passed data and draw it.
  */
 class Model
 {
@@ -66,23 +69,34 @@ public:
 
     // --------- state -----------------------
 
-    /** Sets the current color. Any subsequent call to addVertex will
-        use this color. */
+    /** Sets the current color. Any subsequent call to the
+        easy form of addVertex() will use this color. */
     void setColor(ColorType r, ColorType g, ColorType b, ColorType a)
-    { curR_ = r; curG_ = g; curB_ = b; curA_ = a; }
+        { curR_ = r; curG_ = g; curB_ = b; curA_ = a; }
+
+    /** Sets the current normal. Any subsequent call to the
+        easy form of addVertex() will use this normal. */
+    void setNormal(NormalType nx, NormalType ny, NormalType nz)
+        { curNx_ = nx; curNy_ = ny; curNz_ = nz; }
 
     // -------- vertex/triangle handling -----
 
     /** Clear ALL contents */
     void clear();
 
-    int addVertex(VertexType x, VertexType y, VertexType z)
-    { return addVertex(x,y,z, 0,0,0, curR_, curG_, curB_, curA_); }
+    /** Adds a vertex (point) with currently set normal and color.
+        @returns the index of the vertex.
+        @see setColor(), setNormal() */
+    IndexType addVertex(VertexType x, VertexType y, VertexType z)
+        { return addVertex(x,y,z, curNx_,curNy_,curNz_, curR_, curG_, curB_, curA_); }
 
-    int addVertex(VertexType x, VertexType y, VertexType z,
+    /** Adds a vertex (point) with normal and color.
+        @returns the index of the vertex. */
+    IndexType addVertex(VertexType x, VertexType y, VertexType z,
                   NormalType nx, NormalType ny, NormalType nz,
                   ColorType r, ColorType g, ColorType b, ColorType a);
 
+    /** Connects three previously created indices to form a triangle. */
     void addTriangle(IndexType p1, IndexType p2, IndexType p3);
 
     // ------- convenience functions -------
@@ -91,7 +105,9 @@ public:
         Normals that share multiple triangles will be averaged. */
     void calculateTriangleNormals();
 
-    void unIndex();
+    /** Makes every vertex in the model unique.
+        After this call, every triangle will have it's unique vertices. */
+    void unGroupVertices();
 
     // ------------- opengl / drawing ---------------
 
@@ -104,7 +120,7 @@ public:
 
     /** Transmits the vertex attribute locations from the shader.
         This needs to be called for Model to create it's vertex array object */
-    void setVertexAttributes(const ShaderAttributeLocations&);
+    void setShaderLocations(const ShaderLocations&);
 
     /** Draws the vertex array object.
         @note This needs a shader working with the vertex attributes. */
@@ -128,8 +144,10 @@ private:
 
     ColorType
         curR_, curG_, curB_, curA_;
+    NormalType
+        curNx_, curNy_, curNz_;
 
-    ShaderAttributeLocations attribs_;
+    ShaderLocations attribs_;
 
     /** vertex array object */
     GLuint buffers_[3], vao_;

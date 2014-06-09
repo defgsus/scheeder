@@ -21,7 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef BASIC3DWIDGET_H
 #define BASIC3DWIDGET_H
 
-#include "opengl.h"
+#include <QtCore>
+
+#ifdef Q_OS_LINUX
+// on linux, we need to include this before QGLWidget
+// to enable the gl extensions
+#   include "opengl.h"
+#endif
 
 #include <QGLWidget>
 

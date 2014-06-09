@@ -105,7 +105,7 @@ public:
         data to the shader.
         Can be called after succesful compilation.
     */
-    const ShaderAttributeLocations& getVertexAttributes() const { return attribs_; }
+    const ShaderLocations& getShaderLocations() const { return attribs_; }
 
     // ---------- source/compiler ------------
 
@@ -166,7 +166,7 @@ private:
 
     // --- attributes ---
 
-    ShaderAttributeLocations attribs_;
+    ShaderLocations attribs_;
 
     QString
           attribNamePosition_,

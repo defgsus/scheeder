@@ -98,16 +98,19 @@ void Basic3DWidget::resizeGL(int w, int h)
     // set the viewport to the widget's size
     glViewport(0,0,w,h);
 
-    /*
     // set the projection matrix
+    /* NOTE: This is pretty much openGL v1-2 stuff.
+     * In later versions projection and view matrices are
+     * passed to the shaders directly.
+     * They are still here, to enable some easy immidiate-drawing
+     * of the coordinate system */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glLoadMatrixf(glm::value_ptr(projectionMatrix_));
+    glLoadMatrixf(glm::value_ptr(projectionMatrix_));
     // initialize the transformation matrix
     // (although this is overwritten in paintGL();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    */
 }
 
 

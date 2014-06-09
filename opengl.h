@@ -39,10 +39,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #endif
 
 
-/** Exchange of common vertex attribute locations.
+/** Exchange of common vertex attribute and uniform locations.
     @note This is totally specific to this application
 */
-struct ShaderAttributeLocations
+struct ShaderLocations
 {
     // vertex attributes
     GLuint

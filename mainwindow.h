@@ -64,6 +64,8 @@ private slots:
     void slotLoadVertexShader();
     void slotLoadFragmentShader();
 
+    void slotCreateModel();
+
 private:
     /** Creates all the main widgets */
     void createWidgets_();
@@ -100,7 +102,11 @@ private:
 
     Glsl * shader_;
 
-    QAction * doAutoCompile_;
+    QAction * doAutoCompile_,
+            * doGroupVertices_,
+            * modelBox_,
+            * modelSphere_,
+            * modelPot_;
 };
 
 #endif // MAINWINDOW_H

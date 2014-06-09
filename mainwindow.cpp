@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "sourcewidget.h"
 #include "appsettings.h"
 #include "modelfactory.h"
+#include "model.h"
 #include "glsl.h"
 #include "uniformwidgetfactory.h"
 
@@ -159,30 +160,29 @@ void MainWindow::createMainMenu_()
 
     // --- model menu ---
     m = new QMenu(tr("&Model"), this);
-    a = new QAction(tr("Create &Box"), this);
+
+    // create a group to make only one model checkable at a time
+    auto group = new QActionGroup(this);
+    connect(group, SIGNAL(triggered(QAction*)), this, SLOT(slotCreateModel()));
+
+    modelBox_ = a = new QAction(tr("Create &Box"), this);
+    a->setCheckable(true);
     m->addAction(a);
-    connect(a, &QAction::triggered, [=]()
-    {
-        ModelFactory f;
-        Model * m = f.createCube(5);
-        renderer_->setModel(m);
-    });
-    a = new QAction(tr("Create &UV-Sphere"), this);
+    group->addAction(a);
+    modelSphere_ = a = new QAction(tr("Create UV-&Sphere"), this);
+    a->setCheckable(true);
     m->addAction(a);
-    connect(a, &QAction::triggered, [=]()
-    {
-        ModelFactory f;
-        Model * m = f.createUVSphere(5, 20, 20);
-        renderer_->setModel(m);
-    });
-    a = new QAction(tr("Create famous &Teapot"), this);
+    group->addAction(a);
+    modelPot_ = a = new QAction(tr("Create famous &Teapot"), this);
+    a->setCheckable(true);
     m->addAction(a);
-    connect(a, &QAction::triggered, [=]()
-    {
-        ModelFactory f;
-        Model * m = f.createTeapot(1.f);
-        renderer_->setModel(m);
-    });
+    group->addAction(a);
+
+    m->addSeparator();
+    doGroupVertices_ = a = new QAction(tr("group vertices"), this);
+    a->setCheckable(true);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotCreateModel()));
 
     menuBar()->addMenu(m);
 
@@ -576,4 +576,24 @@ void MainWindow::slotLoadFragmentShader()
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
     updateSourceTitles_();
+}
+
+void MainWindow::slotCreateModel()
+{
+    float scale = 5.f;
+
+    ModelFactory f;
+    Model * m;
+
+    if (modelBox_->isChecked())
+        m = f.createCube(scale);
+    else if (modelSphere_->isChecked())
+        m = f.createUVSphere(scale, 20, 20);
+    else
+        m = f.createTeapot(scale/5);
+
+    if (!doGroupVertices_->isChecked())
+        m->unGroupVertices();
+
+    renderer_->setModel(m);
 }

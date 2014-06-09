@@ -64,7 +64,6 @@ void RenderWidget::reconfigure()
 void RenderWidget::setModel(Model * m)
 {
     newModel_ = m;
-    m->unIndex();
     update();
 }
 
@@ -86,9 +85,9 @@ void RenderWidget::paintGL()
     applyOptions_();
 
     // clear screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //Basic3DWidget::paintGL();
+    Basic3DWidget::paintGL();
 
     if (doDrawCoords_)
         drawCoords_(10);
@@ -145,18 +144,18 @@ void RenderWidget::paintGL()
         shader_->activate();
         shader_->sendUniforms();
         glUniformMatrix4fv(
-            shader_->getVertexAttributes().projection,
-            1, GL_FALSE, &projectionMatrix()[0][0]);
+            shader_->getShaderLocations().projection,
+            1, GL_FALSE, glm::value_ptr(projectionMatrix()));
         glUniformMatrix4fv(
-            shader_->getVertexAttributes().view,
-            1, GL_FALSE, &transformationMatrix()[0][0]);
+            shader_->getShaderLocations().view,
+            1, GL_FALSE, glm::value_ptr(transformationMatrix()));
     }
 
     if (model_)
     {
         // compile model vao with new attribute locations
         if (sendAttributes && shader_)
-            model_->setVertexAttributes(shader_->getVertexAttributes());
+            model_->setShaderLocations(shader_->getShaderLocations());
 
         // and finally draw
         if (model_->isVAO())

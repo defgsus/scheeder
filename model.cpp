@@ -17,7 +17,7 @@ along with this software; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
-#include <QDebug>
+
 #include "model.h"
 #include "vector.h"
 #include "debug.h"
@@ -27,6 +27,9 @@ Model::Model()
         curG_   (.5f),
         curB_   (.5f),
         curA_   (1.f),
+        curNx_  (0.f),
+        curNy_  (0.f),
+        curNz_  (1.f),
         isVAO_  (false)
 {
 }
@@ -40,7 +43,7 @@ void Model::clear()
     index_.clear();
 }
 
-int Model::addVertex(
+Model::IndexType Model::addVertex(
                 VertexType x, VertexType y, VertexType z,
                 NormalType nx, NormalType ny, NormalType nz,
                 ColorType r, ColorType g, ColorType b, ColorType a)
@@ -68,7 +71,7 @@ void Model::addTriangle(IndexType p1, IndexType p2, IndexType p3)
     index_.push_back(p3);
 }
 
-void Model::setVertexAttributes(const ShaderAttributeLocations &v)
+void Model::setShaderLocations(const ShaderLocations &v)
 {
     attribs_ = v;
     createVAO_();
@@ -78,8 +81,8 @@ void Model::draw() const
 {
     SCH_CHECK_GL( glBindVertexArray(vao_) );
 
-    SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
-    //SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
+    //SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
+    SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
 
     SCH_CHECK_GL( glBindVertexArray(0) );
 }
@@ -157,8 +160,9 @@ void Model::calculateTriangleNormals()
 
 }
 
-void Model::unIndex()
+void Model::unGroupVertices()
 {
+    // backup data
     auto vertex = vertex_;
     auto normal = normal_;
     auto color = color_;
@@ -169,6 +173,7 @@ void Model::unIndex()
     color_.clear();
     index_.clear();
 
+    // for each previous triangle ..
     for (uint i=0; i<index.size()/3; ++i)
     {
         IndexType
@@ -186,9 +191,12 @@ void Model::unIndex()
                            normal[i3*3], normal[i3*3+1], normal[i3*3+2],
                            color[i3*4], color[i3*4+1], color[i3*4+2], color[i3*4+3]);
 
+        // .. create a new unique triangle
         addTriangle(t1, t2, t3);
     }
 
+    // recalculate the normals
+    // to show difference between shared and un-shared vertices
     calculateTriangleNormals();
 }
 
