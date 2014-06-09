@@ -19,6 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 /** @file
     @brief system-independent wrapper for opengl headers.
+
+    @note On Unix systems, it seems to be okay to just include the
+    system's opengl headers, since they normally represent the API version
+    that is supported by the system.
+
+    <p>On Windows, however, only OpenGL 1.2 is supported by the system headers.
+    It is generally nescessary to query the function entries for higher API
+    functions at runtime. Qt does this quite conveniently (no need for libGLEW
+    or something like that). But it is nescessary to change the application
+    a bit. The SCH_USE_QT_OPENGLFUNC is used for that. Every class that uses
+    opengl functionallity must derive from QOpenGLFunctions and call
+    initializeOpenGLFunctions() once the opengl context is available.
+    There is a isInitialized() function to query for that, but it seems
+    it got forgotton to declare (undefined reference error). So my classes
+    have their own flags which adds just a little-bit of code noise..</p>
 */
 #ifndef OPENGL_H
 #define OPENGL_H
@@ -38,15 +53,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #   include <GL/glext.h>
 
 #elif defined(Q_OS_WIN)
+
 #   include <QOpenGLFunctions_3_3_Core>
 #   define SCH_USE_QT_OPENGLFUNC
+
 #endif
 
 
 
 
 /** Exchange of common vertex attribute and uniform locations.
-    @note This is totally specific to this application
+    @note This is totally specific to this application. The
+    code names of these are defined in AppSettings.
 */
 struct ShaderLocations
 {

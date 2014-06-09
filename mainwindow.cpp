@@ -232,11 +232,11 @@ void MainWindow::createMainMenu_()
     // --- animation menu ---
     m = new QMenu(tr("&Animation"), this);
     menuBar()->addMenu(m);
-    startAnim_ = a = new QAction(tr("start animation"), this);
+    startAnim_ = a = new QAction(tr("start"), this);
     m->addAction(a);
     a->setShortcut(Qt::Key_F7);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(startAnimation()));
-    stopAnim_ = a = new QAction(tr("stop animation"), this);
+    stopAnim_ = a = new QAction(tr("stop"), this);
     m->addAction(a);
     a->setShortcut(Qt::Key_F8);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
