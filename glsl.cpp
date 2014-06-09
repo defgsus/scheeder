@@ -50,6 +50,9 @@ Glsl::Glsl()
         sourceChanged_  (false),
         ready_          (false),
         activated_      (false)
+#ifdef SCH_USE_QT_OPENGLFUNC
+        ,isGlFuncInitialized_(false)
+#endif
 {
 }
 
@@ -71,6 +74,14 @@ bool Glsl::compile()
 {
     // temporarily save uniforms
 //    auto unicopy = uniforms_;
+
+#ifdef SCH_USE_QT_OPENGLFUNC
+    if (!isGlFuncInitialized_)
+    {
+        initializeOpenGLFunctions();
+        isGlFuncInitialized_ = true;
+    }
+#endif
 
     // init state
     ready_ = false;

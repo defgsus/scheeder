@@ -31,6 +31,9 @@ Model::Model()
         curNy_  (0.f),
         curNz_  (1.f),
         isVAO_  (false)
+#ifdef SCH_USE_QT_OPENGLFUNC
+        ,isGlFuncInitialized_(false)
+#endif
 {
 }
 
@@ -69,39 +72,6 @@ void Model::addTriangle(IndexType p1, IndexType p2, IndexType p3)
     index_.push_back(p1);
     index_.push_back(p2);
     index_.push_back(p3);
-}
-
-void Model::setShaderLocations(const ShaderLocations &v)
-{
-    attribs_ = v;
-    createVAO_();
-}
-
-void Model::draw() const
-{
-    SCH_CHECK_GL( glBindVertexArray(vao_) );
-
-    //SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
-    SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
-
-    SCH_CHECK_GL( glBindVertexArray(0) );
-}
-
-void Model::drawOldschool() const
-{
-    SCH_CHECK_GL( glEnableClientState(GL_COLOR_ARRAY) );
-    SCH_CHECK_GL( glEnableClientState(GL_NORMAL_ARRAY) );
-    SCH_CHECK_GL( glEnableClientState(GL_VERTEX_ARRAY) );
-
-    SCH_CHECK_GL( glVertexPointer(3, VertexEnum, 0, &vertex_[0]) );
-    SCH_CHECK_GL( glNormalPointer(NormalEnum, 0, &normal_[0]) );
-    SCH_CHECK_GL( glColorPointer(4, ColorEnum,  0, &color_[0]) );
-
-    SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
-
-    SCH_CHECK_GL( glDisableClientState(GL_VERTEX_ARRAY) );
-    SCH_CHECK_GL( glDisableClientState(GL_COLOR_ARRAY) );
-    SCH_CHECK_GL( glDisableClientState(GL_NORMAL_ARRAY) );
 }
 
 
@@ -201,8 +171,58 @@ void Model::unGroupVertices()
 
 
 
+// ----------------- openGL context dependend stuff -----------------------
+
+
+
+void Model::setShaderLocations(const ShaderLocations &v)
+{
+    attribs_ = v;
+    createVAO_();
+}
+
+void Model::draw()
+{
+#ifdef SCH_USE_QT_OPENGLFUNC
+    initQtOpenGl_();
+#endif
+
+    SCH_CHECK_GL( glBindVertexArray(vao_) );
+
+    //SCH_CHECK_GL( glDrawArrays(GL_TRIANGLES, 0, vertex_.size()/3) );
+    SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
+
+    SCH_CHECK_GL( glBindVertexArray(0) );
+}
+
+void Model::drawOldschool()
+{
+#ifdef SCH_USE_QT_OPENGLFUNC
+    initQtOpenGl_();
+#endif
+
+    SCH_CHECK_GL( glEnableClientState(GL_COLOR_ARRAY) );
+    SCH_CHECK_GL( glEnableClientState(GL_NORMAL_ARRAY) );
+    SCH_CHECK_GL( glEnableClientState(GL_VERTEX_ARRAY) );
+
+    SCH_CHECK_GL( glVertexPointer(3, VertexEnum, 0, &vertex_[0]) );
+    SCH_CHECK_GL( glNormalPointer(NormalEnum, 0, &normal_[0]) );
+    SCH_CHECK_GL( glColorPointer(4, ColorEnum,  0, &color_[0]) );
+
+    SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
+
+    SCH_CHECK_GL( glDisableClientState(GL_VERTEX_ARRAY) );
+    SCH_CHECK_GL( glDisableClientState(GL_COLOR_ARRAY) );
+    SCH_CHECK_GL( glDisableClientState(GL_NORMAL_ARRAY) );
+}
+
+
 void Model::releaseGL()
 {
+#ifdef SCH_USE_QT_OPENGLFUNC
+    initQtOpenGl_();
+#endif
+
     if (glIsVertexArray(vao_))
     {
         SCH_CHECK_GL( glDeleteVertexArrays(1, &vao_) );
@@ -213,6 +233,9 @@ void Model::releaseGL()
 
 void Model::createVAO_()
 {
+#ifdef SCH_USE_QT_OPENGLFUNC
+    initQtOpenGl_();
+#endif
 
     // delete previous
     releaseGL();
@@ -253,4 +276,17 @@ void Model::createVAO_()
     isVAO_ = true;
 }
 
+
+#ifdef SCH_USE_QT_OPENGLFUNC
+void Model::initQtOpenGl_()
+{
+    qDebug() << "initializing opengl functions check";
+    if (!isGlFuncInitialized_)
+    {
+        qDebug() << "initializing opengl functions";
+        initializeOpenGLFunctions();
+        isGlFuncInitialized_ = true;
+    }
+}
+#endif
 

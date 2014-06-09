@@ -44,7 +44,7 @@ const QString default_vertex_source =
         "\tv_pos = a_position.xyz;\n"
         "\t// set final vertex position\n"
         "\tgl_Position = u_projection * u_view * a_position;\n"
-        "};\n";
+        "}\n";
 
 const QString default_fragment_source =
         "#version 140\n"

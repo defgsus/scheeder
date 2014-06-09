@@ -32,6 +32,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QGLWidget>
 
 #include "vector.h"
+#ifndef Q_OS_LINUX
+#   include "opengl.h"
+#endif
 
 /** @brief Helper for setting up a projection/transformation
     matrix with mouse interaction.
@@ -52,6 +55,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
     @endcode
  */
 class Basic3DWidget : public QGLWidget
+#ifdef SCH_USE_QT_OPENGLFUNC
+        , protected QOpenGLFunctions_3_3_Core
+#endif
 {
     Q_OBJECT
 public:
@@ -82,7 +88,9 @@ protected:
     void mousePressEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
 
-    //virtual void initializeGL();
+#ifdef SCH_USE_QT_OPENGLFUNC
+    virtual void initializeGL() { initializeOpenGLFunctions(); }
+#endif
 
     /** Sets the viewport and the projection matrix */
     virtual void resizeGL(int w, int h);

@@ -81,7 +81,7 @@ void MainWindow::createWidgets_()
 
     // render window
     QGLFormat glformat;
-    glformat.setVersion(3,2);
+    glformat.setVersion(3,3);
     renderer_ = new RenderWidget(this, glformat);
     renderer_->setShader(shader_);
     connect(renderer_, SIGNAL(shaderCompiled()), this, SLOT(slotShaderCompiled()));

@@ -23,19 +23,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef OPENGL_H
 #define OPENGL_H
 
+#include <QtCore> // for os flags
 
-#ifdef __APPLE__
+#ifdef Q_OS_OSX
 
 #   include <gl.h>
 #   include <glext.h>
 
-#else
+#elif defined(Q_OS_LINUX)
 
     // enable openGL extensions
 #   define GL_GLEXT_PROTOTYPES
 #   include <GL/gl.h>
 #   include <GL/glext.h>
 
+#elif defined(Q_OS_WIN)
+#   include <QOpenGLFunctions_3_3_Core>
+#   define SCH_USE_QT_OPENGLFUNC
 #endif
 
 

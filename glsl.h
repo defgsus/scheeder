@@ -68,6 +68,9 @@ private:
 
 
 class Glsl
+#ifdef SCH_USE_QT_OPENGLFUNC
+    :   protected QOpenGLFunctions_3_3_Core
+#endif
 {
 public:
 
@@ -168,6 +171,9 @@ private:
 
     ShaderLocations attribs_;
 
+#ifdef SCH_USE_QT_OPENGLFUNC
+    bool isGlFuncInitialized_;
+#endif
 };
 
 #endif // GLSL_H

@@ -12,9 +12,9 @@ CONFIG += c++11
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets opengl
 
-macx {
-    INCLUDEPATH += /usr/local/include
-}
+macx: INCLUDEPATH += /usr/local/include
+
+QMAKE_CXXFLAGS += -DGLM_FORCE_RADIANS
 
 SOURCES += \
     main.cpp\

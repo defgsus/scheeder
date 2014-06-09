@@ -34,6 +34,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
     from the passed data and draw it.
  */
 class Model
+#ifdef SCH_USE_QT_OPENGLFUNC
+        : protected QOpenGLFunctions_3_3_Core
+#endif
 {
 public:
     // ------- types ---------
@@ -124,10 +127,10 @@ public:
 
     /** Draws the vertex array object.
         @note This needs a shader working with the vertex attributes. */
-    void draw() const;
+    void draw();
 
     /** Draws the model through oldschool opengl arrays */
-    void drawOldschool() const;
+    void drawOldschool();
 
     /** @} */
 
@@ -135,6 +138,10 @@ private:
 
     /** Creates the vertexArrayObject from the initialized data. */
     void createVAO_();
+
+#ifdef SCH_USE_QT_OPENGLFUNC
+    void initQtOpenGl_();
+#endif
 
     std::vector<VertexType>       vertex_;
     std::vector<NormalType>       normal_;
@@ -152,6 +159,11 @@ private:
     /** vertex array object */
     GLuint buffers_[3], vao_;
     bool isVAO_;
+
+#ifdef SCH_USE_QT_OPENGLFUNC
+    bool isGlFuncInitialized_;
+#endif
+
 };
 
 #endif // MODEL_H
