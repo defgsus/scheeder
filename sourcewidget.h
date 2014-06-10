@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define SOURCEWIDGET_H
 
 #include <QTextEdit>
+#include <QTimer>
 
 class QSyntaxHighlighter;
 
@@ -38,12 +39,23 @@ public:
     const QString& filename() const { return filename_; }
     bool modified() const { return modified_; }
     void setModified(bool modified) { modified_ = modified; }
+
 signals:
+
+    /** Signal is issued with a little delay after text was modified. */
+    void recompile();
+
+    /** Signal for updating the MainWindow's status bar message */
+    void statusMessage(const QString&);
 
 public slots:
 
     bool loadFile(const QString& filename);
     bool saveFile(const QString& filename);
+
+private slots:
+
+    void slotTextChanged();
 
 private:
 
@@ -52,6 +64,8 @@ private:
 
     QString filename_;
     bool modified_;
+
+    QTimer timer_;
 };
 
 #endif // SOURCEWIDGET_H

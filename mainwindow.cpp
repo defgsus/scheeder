@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QDebug>
+#include <QLabel>
 #include <QDockWidget>
 #include <QMenu>
 #include <QTextBrowser>
@@ -79,6 +80,10 @@ void MainWindow::createWidgets_()
 {
     ui_->setupUi(this);
 
+    // status bar
+    statusLabel_ = new QLabel(this);
+    statusBar()->addWidget(statusLabel_);
+
     // render window
     QGLFormat glformat;
     glformat.setVersion(3,3);
@@ -94,7 +99,9 @@ void MainWindow::createWidgets_()
     editVert_ = new SourceWidget(this);
     editVert_->setText(appSettings->getValue("vertex_source").toString());
     editVert_->setModified(false);
-    connect(editVert_, SIGNAL(textChanged()), this, SLOT(slotSourceChanged()));
+    connect(editVert_, SIGNAL(textChanged()), this, SLOT(slotUpdateSourceTitles()));
+    connect(editVert_, SIGNAL(recompile()), this, SLOT(slotSourceChanged()));
+    connect(editVert_, SIGNAL(statusMessage(QString)), this, SLOT(slotStatusMessage(QString)));
     dw = editVertDock_ = getDockWidget_("vertex_source", tr("vertex source"));
     dw->setWidget(editVert_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
@@ -103,7 +110,9 @@ void MainWindow::createWidgets_()
     editFrag_ = new SourceWidget(this);
     editFrag_->setText(appSettings->getValue("fragment_source").toString());
     editFrag_->setModified(false);
-    connect(editFrag_, SIGNAL(textChanged()), this, SLOT(slotSourceChanged()));
+    connect(editFrag_, SIGNAL(textChanged()), this, SLOT(slotUpdateSourceTitles()));
+    connect(editFrag_, SIGNAL(recompile()), this, SLOT(slotSourceChanged()));
+    connect(editFrag_, SIGNAL(statusMessage(QString)), this, SLOT(slotStatusMessage(QString)));
     dw = editFragDock_ = getDockWidget_("fragment_source", tr("fragment source"));
     dw->setWidget(editFrag_);
     addDockWidget(Qt::RightDockWidgetArea, dw);
@@ -343,7 +352,6 @@ void MainWindow::deleteUniformWidgets_()
 
 void MainWindow::slotSourceChanged()
 {
-    updateSourceTitles_();
     if (doAutoCompile_->isChecked())
         compileShader();
 }
@@ -383,7 +391,10 @@ void MainWindow::slotUniformChanged(Uniform * )
     renderer_->update();
 }
 
-
+void MainWindow::slotStatusMessage(const QString &text)
+{
+    statusLabel_->setText(text);
+}
 
 // -------------------- SOURCE LOAD/SAVE ----------------------------
 
@@ -411,7 +422,7 @@ void MainWindow::slotSaveShader()
             editFrag_->saveFile(editFrag_->filename());
     }
 
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 }
 
 void MainWindow::slotSaveShaderAs()
@@ -463,7 +474,7 @@ choose_again:
     // store current file path
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 }
 
 bool MainWindow::slotSaveVertexShaderAs()
@@ -487,7 +498,7 @@ bool MainWindow::slotSaveVertexShaderAs()
     // store current file path
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 
     return true;
 }
@@ -512,12 +523,12 @@ bool MainWindow::slotSaveFragmentShaderAs()
     // store current file path
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 
     return true;
 }
 
-void MainWindow::updateSourceTitles_()
+void MainWindow::slotUpdateSourceTitles()
 {
     // enable save all only when source is modified
     saveAll_->setEnabled(editVert_->modified() || editFrag_->modified());
@@ -561,7 +572,7 @@ void MainWindow::slotLoadShader()
     // store current file path
     appSettings->setValue("source_path", QDir(fn[0]).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 }
 
 void MainWindow::slotLoadVertexShader()
@@ -583,7 +594,7 @@ void MainWindow::slotLoadVertexShader()
     // store current file path
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 }
 
 void MainWindow::slotLoadFragmentShader()
@@ -605,7 +616,7 @@ void MainWindow::slotLoadFragmentShader()
     // store current file path
     appSettings->setValue("source_path", QDir(fn).absolutePath());
     // update titles
-    updateSourceTitles_();
+    slotUpdateSourceTitles();
 }
 
 void MainWindow::slotCreateModel()

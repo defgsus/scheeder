@@ -28,6 +28,7 @@ namespace Ui { class MainWindow; }
 class QDockWidget;
 class QTextBrowser;
 class QAction;
+class QLabel;
 class RenderWidget;
 class SourceWidget;
 class Glsl;
@@ -66,6 +67,11 @@ private slots:
 
     void slotCreateModel();
 
+    void slotUpdateSourceTitles();
+
+    /** Sets the statusbar label's text */
+    void slotStatusMessage(const QString&);
+
 private:
     /** Creates all the main widgets */
     void createWidgets_();
@@ -85,7 +91,6 @@ private:
 
     void updateUniformWidgets_();
     void deleteUniformWidgets_();
-    void updateSourceTitles_();
 
     // -------------- private member ---------------------
 
@@ -97,6 +102,7 @@ private:
 
     QWidget * uniEdit_;
     UniformWidgetFactory * uniFactory_;
+    QLabel * statusLabel_;
 
     QTextBrowser * log_;
 

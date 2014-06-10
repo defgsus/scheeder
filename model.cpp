@@ -189,7 +189,7 @@ void Model::draw()
 
 #ifdef __APPLE__
     SCH_CHECK_GL( glBindVertexArrayAPPLE(vao_) );
-#elif
+#else
     SCH_CHECK_GL( glBindVertexArray(vao_) );
 #endif
 
@@ -198,7 +198,7 @@ void Model::draw()
 
 #ifdef __APPLE__
     SCH_CHECK_GL( glBindVertexArrayAPPLE(0) );
-#elif
+#else
     SCH_CHECK_GL( glBindVertexArray(0) );
 #endif
 }
@@ -237,7 +237,7 @@ void Model::releaseGL()
         SCH_CHECK_GL( glDeleteVertexArraysAPPLE(1, &vao_) );
         SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
     }
-#elif
+#else
     if (glIsVertexArray(vao_))
     {
         SCH_CHECK_GL( glDeleteVertexArrays(1, &vao_) );
@@ -259,13 +259,13 @@ void Model::createVAO_()
     // create the object
 #ifdef __APPLE__
     SCH_CHECK_GL( glGenVertexArraysAPPLE(1, &vao_) );
-#elif
+#else
     SCH_CHECK_GL( glGenVertexArrays(1, &vao_) );
 #endif
     // and bind it
 #ifdef __APPLE__
     SCH_CHECK_GL( glBindVertexArrayAPPLE(vao_) );
-#elif
+#else
     SCH_CHECK_GL( glBindVertexArray(vao_) );
 #endif
 

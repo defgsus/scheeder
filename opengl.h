@@ -34,6 +34,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
     There is a isInitialized() function to query for that, but it seems
     it got forgotton to declare (undefined reference error). So my classes
     have their own flags which adds just a little-bit of code noise..</p>
+
+    <p>UPDATE: Well, the only system that does not seems to care about the
+    API version is linux. OSX seems to have some issues as well (Thanks
+    Martin for pointing out). Probably best to generally use the
+    QOpenGLFunctions wrapper. TODO for next release...</p>
+
 */
 #ifndef OPENGL_H
 #define OPENGL_H

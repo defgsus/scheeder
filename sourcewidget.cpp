@@ -49,8 +49,21 @@ SourceWidget::SourceWidget(QWidget *parent) :
     // attach syntax highlighter
     highlighter_ = new GlslHighlighter(document());
 
+    // time after which a recompile() signal is issued
+    timer_.setInterval(2000);
+    connect(&timer_, SIGNAL(timeout()), this, SIGNAL(recompile()));
+
     // change modified state on text-edit
-    connect(this, &QTextEdit::textChanged, [=](){ modified_ = true; });
+    connect(this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
+
+    // send cursor position to mainwindow
+    connect(this, &QTextEdit::cursorPositionChanged, [=]()
+    {
+        auto c = textCursor();
+        statusMessage( QString("%1 : %2")
+                       .arg(c.blockNumber() + 1)
+                       .arg(c.columnNumber() + 1) );
+    });
 }
 
 SourceWidget::~SourceWidget()
@@ -92,4 +105,11 @@ bool SourceWidget::saveFile(const QString &fn)
     modified_ = false;
     filename_ = fn;
     return true;
+}
+
+void SourceWidget::slotTextChanged()
+{
+    modified_ = true;
+
+    timer_.start();
 }
