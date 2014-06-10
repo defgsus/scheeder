@@ -259,6 +259,20 @@ void MainWindow::createMainMenu_()
     a->setShortcut(Qt::Key_F8);
     connect(a, SIGNAL(triggered()), renderer_, SLOT(stopAnimation()));
 
+    // --- help menu ---
+    m = new QMenu(tr("&Help"), this);
+    menuBar()->addMenu(m);
+    a = new QAction(tr("Quick &help"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotHelp()));
+    m->addSeparator();
+    a = new QAction(tr("&About"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotAboutBox()));
+    a = new QAction(tr("About &Qt"), this);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), this, SLOT(slotAboutQt()));
+
 }
 
 QAction * MainWindow::createRenderOptionAction_(const QString& option, const QString& name)
@@ -646,4 +660,61 @@ void MainWindow::slotCreateModel()
         m->unGroupVertices();
 
     renderer_->setModel(m);
+}
+
+void MainWindow::slotHelp()
+{
+    QString attribs = QString(
+                "vec4 %1;\t// vertex position\n"
+                "vec3 %2;\t// vertex normal\n"
+                "vec4 %3;\t// vertex color (rgba)")
+            .arg(appSettings->getValue("ShaderAttributes/position").toString())
+            .arg(appSettings->getValue("ShaderAttributes/normal").toString())
+            .arg(appSettings->getValue("ShaderAttributes/color").toString());
+
+    QString uniforms = QString(
+                "mat4 %1;\t// projection matrix\n"
+                "mat4 %2;\t// transformation/view matrix\n"
+                "float %3;\t// aspect ratio (width divided by height)\n"
+                "float %4;\t// animation time in seconds")
+            .arg(appSettings->getValue("ShaderUniforms/projection").toString())
+            .arg(appSettings->getValue("ShaderUniforms/view").toString())
+            .arg(appSettings->getValue("ShaderUniforms/aspect").toString())
+            .arg(appSettings->getValue("ShaderUniforms/time").toString());
+
+    QMessageBox::about(this, tr("Short help"),
+        tr("This program is basically a live shader editor.\n"
+           "The important things to say here are the names of the "
+           "application specific attributes and uniforms. These are:\n\n"
+           "vertex attributes:\n"
+           "%1\n\n"
+           "and uniforms:\n"
+           "%2\n\n"
+           "All other uniforms that are defined and used in a shader "
+           "are automatically exposed to the user-interface as widgets.\n"
+           "The types of supported uniforms are currently:\n"
+           "float, vec2, vec3 and vec4"
+           ).arg(attribs).arg(uniforms)
+    );
+}
+
+void MainWindow::slotAboutBox()
+{
+    QMessageBox::about(this,
+        tr("About Scheeder"),
+        tr("<html>Little demo application for programming OpenGL and GLSL in Qt."
+           "<p>(c) 2014 stefan.berke @ modular-audio-graphics.com</p>"
+           "<p>This is free software - with free as in freedom -<br/>"
+           "licensed under the GNU General Public License 3.0</p>"
+           "<p>The source is available at<br/>"
+           "<a href=\"https://github.com/defgsus/scheeder\">github.com/defgsus/scheeder</a></p>"
+           "<p>built %1 %2</p></html>")
+                       .arg(__DATE__)
+                       .arg(__TIME__)
+        );
+}
+
+void MainWindow::slotAboutQt()
+{
+    QMessageBox::aboutQt(this);
 }

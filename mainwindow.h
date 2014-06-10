@@ -72,6 +72,10 @@ private slots:
     /** Sets the statusbar label's text */
     void slotStatusMessage(const QString&);
 
+    void slotHelp();
+    void slotAboutBox();
+    void slotAboutQt();
+
 private:
     /** Creates all the main widgets */
     void createWidgets_();
