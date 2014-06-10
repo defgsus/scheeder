@@ -226,6 +226,15 @@ void MainWindow::createMainMenu_()
         appSettings->setValue("auto_compile", check);
     });
 
+    m->addSeparator();
+    a = new QAction(tr("Go to &vertex editor"), this);
+    a->setShortcut(Qt::ALT + Qt::Key_1);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), editVert_, SLOT(setFocus()));
+    a = new QAction(tr("Go to &fragment editor"), this);
+    a->setShortcut(Qt::ALT + Qt::Key_2);
+    m->addAction(a);
+    connect(a, SIGNAL(triggered()), editFrag_, SLOT(setFocus()));
 
     // --- options menu ---
     m = new QMenu(tr("&Options"), this);
