@@ -92,6 +92,7 @@ void MainWindow::createWidgets_()
     renderer_->setShader(shader_);
     connect(renderer_, SIGNAL(shaderCompiled()), this, SLOT(slotShaderCompiled()));
     auto dw = getDockWidget_("opengl_window", tr("OpenGL window"));
+    rendererDock_ = dw;
     dw->setWidget(renderer_);
     addDockWidget(Qt::LeftDockWidgetArea, dw);
 
@@ -245,6 +246,19 @@ void MainWindow::createMainMenu_()
     m->addAction(createRenderOptionAction_("doDepthTest", "depth test"));
     m->addAction(createRenderOptionAction_("doCullFace", "cull faces"));
     m->addAction(createRenderOptionAction_("doFrontFaceCCW", "front is counter-clockwise"));
+    /*
+    m->addSeparator();
+    a = new QAction(tr("external opengl view"), this);
+    a->setShortcut(Qt::Key_F2);
+    m->addAction(a);
+    connect(a, &QAction::triggered, [=]()
+    {
+        if (renderer_->parent())
+            renderer_->setParent(0);
+        else
+            renderer_->setParent(rendererDock_);
+    });
+    */
 
 
     // --- animation menu ---

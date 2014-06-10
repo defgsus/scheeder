@@ -102,7 +102,8 @@ private:
 
     RenderWidget * renderer_;
     SourceWidget * editVert_, * editFrag_;
-    QDockWidget * editVertDock_, * editFragDock_;
+    QDockWidget * editVertDock_, * editFragDock_,
+                * rendererDock_;
 
     QWidget * uniEdit_;
     UniformWidgetFactory * uniFactory_;

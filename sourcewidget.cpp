@@ -51,6 +51,7 @@ SourceWidget::SourceWidget(QWidget *parent) :
 
     // time after which a recompile() signal is issued
     timer_.setInterval(2000);
+    timer_.setSingleShot(true);
     connect(&timer_, SIGNAL(timeout()), this, SIGNAL(recompile()));
 
     // change modified state on text-edit
