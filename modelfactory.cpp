@@ -44,26 +44,35 @@ Model * ModelFactory::createBox(
 
     // --- vertices / corner-points ---
 
-
+    // set color for front of box
     m->setColor(0.1,1.0,0.5, 1.);
 
     // front-bottom-left
-    int fbl = m->addVertex(-sx, -sy,  sz),
+    m->setTexCoord(0,0);
+    int fbl = m->addVertex(-sx, -sy,  sz);
     // front-bottom-right
-        fbr = m->addVertex( sx, -sy,  sz),
+    m->setTexCoord(1,0);
+    int fbr = m->addVertex( sx, -sy,  sz);
     // front-top-right
-        ftr = m->addVertex( sx,  sy,  sz),
+    m->setTexCoord(1,1);
+    int ftr = m->addVertex( sx,  sy,  sz);
     // front-top-left
-        ftl = m->addVertex(-sx,  sy,  sz);
+    m->setTexCoord(0,1);
+    int ftl = m->addVertex(-sx,  sy,  sz);
 
+    // color for back of box
     m->setColor(1,0.5,0.1, 1.);
 
     // back-bottom-left
-    int bbl = m->addVertex(-sx, -sy, -sz),
+    m->setTexCoord(0,1);
+    int bbl = m->addVertex(-sx, -sy, -sz);
     // aso..
-        bbr = m->addVertex( sx, -sy, -sz),
-        btr = m->addVertex( sx,  sy, -sz),
-        btl = m->addVertex(-sx,  sy, -sz);
+    m->setTexCoord(1,1);
+    int bbr = m->addVertex( sx, -sy, -sz);
+    m->setTexCoord(1,0);
+    int btr = m->addVertex( sx,  sy, -sz);
+    m->setTexCoord(0,0);
+    int btl = m->addVertex(-sx,  sy, -sz);
 
     // --- surfaces / triangles ---
 
@@ -97,6 +106,7 @@ Model * ModelFactory::createUVSphere(float rad, unsigned int segu, unsigned int 
     Model * m = new Model;
 
     // top point
+    m->setTexCoord(0,1);
     m->addVertex(0, rad, 0);
 
     for (unsigned int v = 1; v<segv; ++v)
@@ -109,6 +119,7 @@ Model * ModelFactory::createUVSphere(float rad, unsigned int segu, unsigned int 
         {
             Vec3 p = pointOnSphere((float)u / segu, (float)v / segv);
 
+            m->setTexCoord((float)u / segu, (float)v / segv);
             m->addVertex(p.x * rad, p.y * rad, p.z * rad);
         }
 
@@ -139,6 +150,7 @@ Model * ModelFactory::createUVSphere(float rad, unsigned int segu, unsigned int 
     int rown = m->numVertices() - segu - 1;
 
     // bottom point
+    m->setTexCoord(0,0);
     m->addVertex(0, -rad, 0);
 
     // connect to bottom point
@@ -158,9 +170,18 @@ Model * ModelFactory::createTeapot(float scale)
 {
     Model * m = new Model;
 
+    float maxy = 0.001;
+    for (int i=0; i<TeapotNS::numVertices; ++i)
+        maxy = std::max(maxy, TeapotNS::vertices[i][1]);
+
     // create vertices
     for (int i=0; i<TeapotNS::numVertices; ++i)
     {
+        // calculate 'some' texture coordinates for the teapot
+        float ang = atan2(TeapotNS::vertices[i][0], TeapotNS::vertices[i][2]);
+        m->setTexCoord(ang / TWO_PI + 0.5f, TeapotNS::vertices[i][1] / maxy);
+
+        // just copy the data
         m->addVertex(TeapotNS::vertices[i][0] * scale,
                      TeapotNS::vertices[i][1] * scale,
                      TeapotNS::vertices[i][2] * scale);

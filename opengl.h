@@ -79,7 +79,8 @@ struct ShaderLocations
     GLuint
         position,
         normal,
-        color;
+        color,
+        texcoord;
     // uniforms
     GLuint
         projection,

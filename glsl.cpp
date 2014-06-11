@@ -239,6 +239,8 @@ void Glsl::getSpecialLocations_()
                     appSettings->getValue("ShaderAttributes/normal").toString().toStdString().c_str()) );
     SCH_CHECK_GL( attribs_.color = glGetAttribLocation(shader_,
                     appSettings->getValue("ShaderAttributes/color").toString().toStdString().c_str()) );
+    SCH_CHECK_GL( attribs_.texcoord = glGetAttribLocation(shader_,
+                    appSettings->getValue("ShaderAttributes/texcoord").toString().toStdString().c_str()) );
     SCH_CHECK_GL( attribs_.projection = glGetUniformLocation(shader_,
                     appSettings->getValue("ShaderUniforms/projection").toString().toStdString().c_str()) );
     SCH_CHECK_GL( attribs_.view = glGetUniformLocation(shader_,

@@ -30,6 +30,8 @@ Model::Model()
         curNx_  (0.f),
         curNy_  (0.f),
         curNz_  (1.f),
+        curU_   (0.f),
+        curV_   (0.f),
         isVAO_  (false)
 #ifdef SCH_USE_QT_OPENGLFUNC
         ,isGlFuncInitialized_(false)
@@ -49,7 +51,8 @@ void Model::clear()
 Model::IndexType Model::addVertex(
                 VertexType x, VertexType y, VertexType z,
                 NormalType nx, NormalType ny, NormalType nz,
-                ColorType r, ColorType g, ColorType b, ColorType a)
+                ColorType r, ColorType g, ColorType b, ColorType a,
+                TextureCoordType u, TextureCoordType v)
 {
     vertex_.push_back(x);
     vertex_.push_back(y);
@@ -63,6 +66,9 @@ Model::IndexType Model::addVertex(
     color_.push_back(g);
     color_.push_back(b);
     color_.push_back(a);
+
+    texcoord_.push_back(u);
+    texcoord_.push_back(v);
 
     return numVertices() - 1;
 }
@@ -135,12 +141,14 @@ void Model::unGroupVertices()
     auto vertex = vertex_;
     auto normal = normal_;
     auto color = color_;
+    auto texcoord = texcoord_;
     auto index = index_;
 
     vertex_.clear();
     normal_.clear();
     color_.clear();
     index_.clear();
+    texcoord_.clear();
 
     // for each previous triangle ..
     for (uint i=0; i<index.size()/3; ++i)
@@ -152,13 +160,16 @@ void Model::unGroupVertices()
 
             t1 = addVertex(vertex[i1*3], vertex[i1*3+1], vertex[i1*3+2],
                            normal[i1*3], normal[i1*3+1], normal[i1*3+2],
-                           color[i1*4], color[i1*4+1], color[i1*4+2], color[i1*4+3]),
+                           color[i1*4], color[i1*4+1], color[i1*4+2], color[i1*4+3],
+                           texcoord[i1*2], texcoord[i1*2+1]),
             t2 = addVertex(vertex[i2*3], vertex[i2*3+1], vertex[i2*3+2],
                            normal[i2*3], normal[i2*3+1], normal[i2*3+2],
-                           color[i2*4], color[i2*4+1], color[i2*4+2], color[i2*4+3]),
+                           color[i2*4], color[i2*4+1], color[i2*4+2], color[i2*4+3],
+                           texcoord[i2*2], texcoord[i2*2+1]),
             t3 = addVertex(vertex[i3*3], vertex[i3*3+1], vertex[i3*3+2],
                            normal[i3*3], normal[i3*3+1], normal[i3*3+2],
-                           color[i3*4], color[i3*4+1], color[i3*4+2], color[i3*4+3]);
+                           color[i3*4], color[i3*4+1], color[i3*4+2], color[i3*4+3],
+                           texcoord[i3*2], texcoord[i3*2+1]);
 
         // .. create a new unique triangle
         addTriangle(t1, t2, t3);
@@ -212,13 +223,16 @@ void Model::drawOldschool()
     SCH_CHECK_GL( glEnableClientState(GL_COLOR_ARRAY) );
     SCH_CHECK_GL( glEnableClientState(GL_NORMAL_ARRAY) );
     SCH_CHECK_GL( glEnableClientState(GL_VERTEX_ARRAY) );
+    SCH_CHECK_GL( glEnableClientState(GL_TEXTURE_COORD_ARRAY) );
 
     SCH_CHECK_GL( glVertexPointer(3, VertexEnum, 0, &vertex_[0]) );
     SCH_CHECK_GL( glNormalPointer(NormalEnum, 0, &normal_[0]) );
     SCH_CHECK_GL( glColorPointer(4, ColorEnum,  0, &color_[0]) );
+    SCH_CHECK_GL( glTexCoordPointer(2, TextureCoordEnum,  0, &texcoord_[0]) );
 
     SCH_CHECK_GL( glDrawElements(GL_TRIANGLES, index_.size(), IndexEnum, &index_[0]) );
 
+    SCH_CHECK_GL( glDisableClientState(GL_TEXTURE_COORD_ARRAY) );
     SCH_CHECK_GL( glDisableClientState(GL_VERTEX_ARRAY) );
     SCH_CHECK_GL( glDisableClientState(GL_COLOR_ARRAY) );
     SCH_CHECK_GL( glDisableClientState(GL_NORMAL_ARRAY) );
@@ -235,13 +249,13 @@ void Model::releaseGL()
     if (glIsVertexArrayAPPLE(vao_))
     {
         SCH_CHECK_GL( glDeleteVertexArraysAPPLE(1, &vao_) );
-        SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
+        SCH_CHECK_GL( glDeleteBuffers(4, buffers_) );
     }
 #else
     if (glIsVertexArray(vao_))
     {
         SCH_CHECK_GL( glDeleteVertexArrays(1, &vao_) );
-        SCH_CHECK_GL( glDeleteBuffers(3, buffers_) );
+        SCH_CHECK_GL( glDeleteBuffers(4, buffers_) );
     }
 #endif
     isVAO_ = false;
@@ -269,9 +283,9 @@ void Model::createVAO_()
     SCH_CHECK_GL( glBindVertexArray(vao_) );
 #endif
 
-    // create buffers for vertex/color/normal
+    // create buffers for vertex/color/normal/texcoord
 
-    SCH_CHECK_GL( glGenBuffers(3, buffers_) );
+    SCH_CHECK_GL( glGenBuffers(4, buffers_) );
 
     if ((int)attribs_.position>=0)
     {
@@ -295,6 +309,14 @@ void Model::createVAO_()
         SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, color_.size() * sizeof(ColorType), &color_[0], GL_STATIC_DRAW) );
         SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.color) );
         SCH_CHECK_GL( glVertexAttribPointer(attribs_.color, 4, ColorEnum, GL_FALSE, 0, NULL) );
+    }
+
+    if ((int)attribs_.texcoord>=0)
+    {
+        SCH_CHECK_GL( glBindBuffer(GL_ARRAY_BUFFER, buffers_[3]) );
+        SCH_CHECK_GL( glBufferData(GL_ARRAY_BUFFER, texcoord_.size() * sizeof(TextureCoordType), &texcoord_[0], GL_STATIC_DRAW) );
+        SCH_CHECK_GL( glEnableVertexAttribArray(attribs_.texcoord) );
+        SCH_CHECK_GL( glVertexAttribPointer(attribs_.texcoord, 2, TextureCoordEnum, GL_FALSE, 0, NULL) );
     }
 
     isVAO_ = true;

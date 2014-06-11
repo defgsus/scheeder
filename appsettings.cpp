@@ -117,6 +117,7 @@ void AppSettings::createDefaultValues_()
     defaultValues_.insert("ShaderAttributes/position",  "a_position");
     defaultValues_.insert("ShaderAttributes/color",     "a_color");
     defaultValues_.insert("ShaderAttributes/normal",    "a_normal");
+    defaultValues_.insert("ShaderAttributes/texcoord",  "a_texcoord");
     defaultValues_.insert("ShaderUniforms/projection",  "u_projection");
     defaultValues_.insert("ShaderUniforms/view",        "u_view");
     defaultValues_.insert("ShaderUniforms/time",        "u_time");

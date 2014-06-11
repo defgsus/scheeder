@@ -691,10 +691,12 @@ void MainWindow::slotHelp()
     QString attribs = QString(
                 "vec4 %1;\t// vertex position<br/>"
                 "vec3 %2;\t// vertex normal<br/>"
-                "vec4 %3;\t// vertex color (rgba)")
+                "vec4 %3;\t// vertex color (rgba)<br/>"
+                "vec2 %4;\t// vertex texture coordinate")
             .arg(appSettings->getValue("ShaderAttributes/position").toString())
             .arg(appSettings->getValue("ShaderAttributes/normal").toString())
-            .arg(appSettings->getValue("ShaderAttributes/color").toString());
+            .arg(appSettings->getValue("ShaderAttributes/color").toString())
+            .arg(appSettings->getValue("ShaderAttributes/texcoord").toString());
 
     QString uniforms = QString(
                 "mat4 %1;\t// projection matrix<br/>"

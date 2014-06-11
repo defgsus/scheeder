@@ -82,6 +82,9 @@ public:
     void setNormal(NormalType nx, NormalType ny, NormalType nz)
         { curNx_ = nx; curNy_ = ny; curNz_ = nz; }
 
+    void setTexCoord(TextureCoordType u, TextureCoordType v)
+        { curU_ = u; curV_ = v; }
+
     // -------- vertex/triangle handling -----
 
     /** Clear ALL contents */
@@ -91,13 +94,14 @@ public:
         @returns the index of the vertex.
         @see setColor(), setNormal() */
     IndexType addVertex(VertexType x, VertexType y, VertexType z)
-        { return addVertex(x,y,z, curNx_,curNy_,curNz_, curR_, curG_, curB_, curA_); }
+        { return addVertex(x,y,z, curNx_,curNy_,curNz_, curR_, curG_, curB_, curA_, curU_, curV_); }
 
     /** Adds a vertex (point) with normal and color.
         @returns the index of the vertex. */
     IndexType addVertex(VertexType x, VertexType y, VertexType z,
                   NormalType nx, NormalType ny, NormalType nz,
-                  ColorType r, ColorType g, ColorType b, ColorType a);
+                  ColorType r, ColorType g, ColorType b, ColorType a,
+                  TextureCoordType u, TextureCoordType v);
 
     /** Connects three previously created indices to form a triangle. */
     void addTriangle(IndexType p1, IndexType p2, IndexType p3);
@@ -153,11 +157,13 @@ private:
         curR_, curG_, curB_, curA_;
     NormalType
         curNx_, curNy_, curNz_;
+    TextureCoordType
+        curU_, curV_;
 
     ShaderLocations attribs_;
 
     /** vertex array object */
-    GLuint buffers_[3], vao_;
+    GLuint buffers_[4], vao_;
     bool isVAO_;
 
 #ifdef SCH_USE_QT_OPENGLFUNC
