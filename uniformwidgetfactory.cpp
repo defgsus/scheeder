@@ -100,6 +100,7 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
                     lh->addWidget(new QLabel(tr("select texture slot"), w));
                     auto sb = new QSpinBox(w);
                     sb->setRange(0, SCH_MAX_TEXTURES-1);
+                    sb->setValue(uniform->ints[0]);
                     lh->addWidget(sb);
                     connect(sb, static_cast<void(QSpinBox::*)(int)>( &QSpinBox::valueChanged ), [=](int i)
                     {

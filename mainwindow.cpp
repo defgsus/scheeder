@@ -689,17 +689,17 @@ void MainWindow::slotCreateModel()
 void MainWindow::slotHelp()
 {
     QString attribs = QString(
-                "vec4 %1;\t// vertex position\n"
-                "vec3 %2;\t// vertex normal\n"
+                "vec4 %1;\t// vertex position<br/>"
+                "vec3 %2;\t// vertex normal<br/>"
                 "vec4 %3;\t// vertex color (rgba)")
             .arg(appSettings->getValue("ShaderAttributes/position").toString())
             .arg(appSettings->getValue("ShaderAttributes/normal").toString())
             .arg(appSettings->getValue("ShaderAttributes/color").toString());
 
     QString uniforms = QString(
-                "mat4 %1;\t// projection matrix\n"
-                "mat4 %2;\t// transformation/view matrix\n"
-                "float %3;\t// aspect ratio (width divided by height)\n"
+                "mat4 %1;\t// projection matrix<br/>"
+                "mat4 %2;\t// transformation/view matrix<br/>"
+                "float %3;\t// aspect ratio (width divided by height)<br/>"
                 "float %4;\t// animation time in seconds")
             .arg(appSettings->getValue("ShaderUniforms/projection").toString())
             .arg(appSettings->getValue("ShaderUniforms/view").toString())
@@ -707,17 +707,21 @@ void MainWindow::slotHelp()
             .arg(appSettings->getValue("ShaderUniforms/time").toString());
 
     QMessageBox::about(this, tr("Short help"),
-        tr("This program is basically a live shader editor.\n"
+        tr("<html>This program is basically a live shader editor.<br/>"
            "The important things to say here are the names of the "
-           "application specific attributes and uniforms. These are:\n\n"
-           "vertex attributes:\n"
-           "%1\n\n"
-           "and uniforms:\n"
-           "%2\n\n"
-           "All other uniforms that are defined and used in a shader "
-           "are automatically exposed to the user-interface as widgets.\n"
-           "The types of supported uniforms are currently:\n"
-           "float, vec2, vec3 and vec4"
+           "application specific attributes and uniforms. These are:"
+           "<p>vertex attributes:"
+           "<pre>%1</pre></p>"
+           "<p>uniforms:"
+           "<pre>%2</pre></p>"
+           "<p>All other uniforms that are defined and used in a shader "
+           "are automatically exposed to the user-interface as widgets.<br/>"
+           "The types of supported uniforms are currently:<br/>"
+           "<b>float, vec2, vec3, vec4</b> and <b>sampler2D</b>.</p>"
+           "<p>The Renderwindow listens to some mouse commands to adjust the "
+           "transformation matrix, these are: <b>left-drag</b> to rotate and "
+           "<b>right-drag</b> to change the distance to the origin.</p>"
+           "</html>"
            ).arg(attribs).arg(uniforms)
     );
 }
