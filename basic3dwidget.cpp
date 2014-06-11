@@ -40,6 +40,9 @@ void Basic3DWidget::viewInit(Float distanceZ)
 void Basic3DWidget::viewRotateX(Float d)
 {
     if (!d) return;
+#ifndef SCH_GLM_USE_DEGREE
+    d /= (360.f / TWO_PI)
+#endif
     rotationMatrix_ =
             glm::rotate(Mat4(), d, Vec3(1,0,0))
             * rotationMatrix_;
@@ -49,6 +52,9 @@ void Basic3DWidget::viewRotateX(Float d)
 void Basic3DWidget::viewRotateY(Float d)
 {
     if (!d) return;
+#ifndef SCH_GLM_USE_DEGREE
+    d /= (360.f / TWO_PI)
+#endif
     rotationMatrix_ =
             glm::rotate(Mat4(), d, Vec3(0,1,0))
             * rotationMatrix_;

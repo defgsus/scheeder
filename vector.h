@@ -39,6 +39,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //#include <glm/detail/func_geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// GLM changed from degree to radians at some point
+#if GLM_VERSION_MAJOR == 0
+#   if GLM_VERSION_MINOR == 9
+#       if GLM_VERSION_PATCH == 2
+#           if GLM_VERSION_REVISION < 5
+#               define SCH_GLM_USE_DEGREE
+#           endif
+#       endif
+#   endif
+#endif
+
 // ----------- good-to-have constants -------------
 
 /** the infamous PI */
