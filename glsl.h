@@ -37,6 +37,9 @@ struct Uniform
         for types GL_FLOAT, GL_FLOAT_VEC2, GL_FLOAT_VEC3 and GL_FLOAT_VEC4. */
     GLfloat floats[4];
 
+    /** A vector of ints. */
+    GLint ints[4];
+
     /** Name as in the shader source */
     const QString& name() const { return name_; }
     /** Type of the uniform (as OpenGL enum) */

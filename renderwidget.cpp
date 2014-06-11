@@ -36,10 +36,14 @@ RenderWidget::RenderWidget(QWidget *parent,
     shader_         (0),
     newShader_      (0),
     requestCompile_ (false),
+    requestTextureUpdate_(false),
     doAnimation_    (false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(256,256);
+
+    for (int i=0; i<4; ++i)
+        texture_[i] = -1;
 
     reconfigure();
 }
@@ -58,6 +62,14 @@ void RenderWidget::reconfigure()
     doCullFace_ = appSettings->getValue("RenderSettings/doCullFace").toBool();
     doFrontFaceCCW_ = appSettings->getValue("RenderSettings/doFrontFaceCCW").toBool();
     doDrawCoords_ = appSettings->getValue("RenderSettings/doDrawCoords").toBool();
+
+    // set image filenames
+    for (int i=0; i<SCH_MAX_TEXTURES; ++i)
+    {
+        QString fn = appSettings->getValue(QString("image%1").arg(i)).toString();
+        if (imageFile_[i] != fn)
+            setImage(i, fn);
+    }
 
     update();
 }
@@ -80,21 +92,30 @@ void RenderWidget::requestCompileShader()
     update();
 }
 
+void RenderWidget::initializeGL()
+{
+    Basic3DWidget::initializeGL();
+}
+
 void RenderWidget::paintGL()
 {
     //glGetError(); /* clear previous errors */
 
     applyOptions_();
 
-    // clear screen
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    // clear screen and such
     Basic3DWidget::paintGL();
 
 #ifndef SCH_USE_QT_OPENGLFUNC
     if (doDrawCoords_)
         drawCoords_(10);
 #endif
+
+    if (requestTextureUpdate_)
+    {
+        requestTextureUpdate_ = false;
+        initTextures_();
+    }
 
     bool sendAttributes = false;
 
@@ -233,3 +254,32 @@ void RenderWidget::applyOptions_()
         SCH_CHECK_GL( glFrontFace(GL_CW) );
 }
 
+void RenderWidget::setImage(uint index, const QString &filename)
+{
+    imageFile_[index] = filename;
+    requestTextureUpdate_ = true;
+}
+
+void RenderWidget::initTextures_()
+{
+    glEnable(GL_TEXTURE_2D);
+
+    for (int i=0; i<SCH_MAX_TEXTURES; ++i)
+    {
+        SCH_CHECK_GL( glActiveTexture(GL_TEXTURE0 + i) );
+
+        // delete previous
+        if (texture_[i] != -1)
+            deleteTexture(texture_[i]);
+
+        texture_[i] = imageFile_[i].isEmpty()? -1 : bindTexture(QImage(imageFile_[i]));
+
+        // filtering/interpolation mode for min- & maxifying
+        SCH_CHECK_GL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST) );
+        SCH_CHECK_GL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
+
+        // repeat texture coordinates when outside range [0,1]
+        SCH_CHECK_GL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT) );
+        SCH_CHECK_GL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT) );
+    }
+}

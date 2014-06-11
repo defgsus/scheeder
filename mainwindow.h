@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QMainWindow>
 
+#include "opengl.h"
+
 // forward declarations
 namespace Ui { class MainWindow; }
 class QDockWidget;
@@ -76,6 +78,8 @@ private slots:
     void slotAboutBox();
     void slotAboutQt();
 
+    void slotSelectImage(uint index);
+
 private:
     /** Creates all the main widgets */
     void createWidgets_();
@@ -112,6 +116,8 @@ private:
     QTextBrowser * log_;
 
     Glsl * shader_;
+
+    QString images_[SCH_MAX_TEXTURES];
 
     QAction * startAnim_,
             * stopAnim_,

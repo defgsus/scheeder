@@ -66,7 +66,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #endif
 
 
-
+/** Maximum number of texture slots */
+#define SCH_MAX_TEXTURES 4
 
 /** Exchange of common vertex attribute and uniform locations.
     @note This is totally specific to this application. The

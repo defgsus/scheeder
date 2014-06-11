@@ -34,6 +34,7 @@ Uniform::Uniform()
         location_(0)
 {
     floats[0] = floats[1] = floats[2] = floats[3] = 0.f;
+    ints[0] = ints[1] = ints[2] = ints[3] = 0;
 }
 
 void Uniform::copyValuesFrom_(Uniform * u)
@@ -42,6 +43,10 @@ void Uniform::copyValuesFrom_(Uniform * u)
     floats[1] = u->floats[1];
     floats[2] = u->floats[2];
     floats[3] = u->floats[3];
+    ints[0] = u->ints[0];
+    ints[1] = u->ints[1];
+    ints[2] = u->ints[2];
+    ints[3] = u->ints[3];
 }
 
 
@@ -298,6 +303,10 @@ void Glsl::sendUniform(const Uniform * u)
 {
     switch (u->type())
     {
+    case GL_SAMPLER_2D:
+    case GL_INT:
+        SCH_CHECK_GL( glUniform1i(u->location_, u->ints[0]) );
+    break;
     case GL_FLOAT:
         SCH_CHECK_GL( glUniform1f(u->location_, u->floats[0]) );
     break;

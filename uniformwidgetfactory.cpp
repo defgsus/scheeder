@@ -22,9 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QLayout>
 #include <QLabel>
 #include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QFileDialog>
 
 #include "uniformwidgetfactory.h"
 #include "glsl.h"
+#include "appsettings.h"
 
 UniformWidgetFactory::UniformWidgetFactory(QObject * parent)
     :   QObject(parent)
@@ -36,7 +40,8 @@ bool UniformWidgetFactory::isSupported(GLenum type) const
     return type == GL_FLOAT
         || type == GL_FLOAT_VEC2
         || type == GL_FLOAT_VEC3
-        || type == GL_FLOAT_VEC4;
+        || type == GL_FLOAT_VEC4
+        || type == GL_SAMPLER_2D;
 }
 
 QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
@@ -88,6 +93,19 @@ QWidget * UniformWidgetFactory::getWidget(Uniform * uniform, QWidget *parent)
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 1) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 2) );
                     lh->addWidget( sb = getFloatWidget_(uniform, w, 3) );
+                }
+                break;
+                case GL_SAMPLER_2D:
+                {
+                    lh->addWidget(new QLabel(tr("select texture slot"), w));
+                    auto sb = new QSpinBox(w);
+                    sb->setRange(0, SCH_MAX_TEXTURES-1);
+                    lh->addWidget(sb);
+                    connect(sb, static_cast<void(QSpinBox::*)(int)>( &QSpinBox::valueChanged ), [=](int i)
+                    {
+                        uniform->ints[0] = i;
+                        uniformChanged(uniform);
+                    });
                 }
                 break;
             }

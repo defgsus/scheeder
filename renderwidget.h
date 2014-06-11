@@ -50,6 +50,9 @@ public slots:
     /** Applies AppSettings */
     void reconfigure();
 
+    /** Sets the image filename for slot [0, SCH_MAX_TEXTURES-1] */
+    void setImage(uint index, const QString& filename);
+
     /** Sets the Model to be rendered.
         Ownership of class is taken! */
     void setModel(Model * m);
@@ -69,6 +72,8 @@ public slots:
 
 protected:
 
+    virtual void initializeGL();
+
     virtual void paintGL();
 
     /** Sets the OpenGL state to the current set options */
@@ -77,12 +82,18 @@ protected:
     /** Send specific uniform values (like projection matrix...) */
     void sendSpecialUniforms_();
 
+    void initTextures_();
+
 private:
 
     Model * model_, * newModel_;
     Glsl * shader_, * newShader_;
 
+    QString imageFile_[SCH_MAX_TEXTURES];
+    GLint texture_[SCH_MAX_TEXTURES];
+
     bool requestCompile_,
+         requestTextureUpdate_,
          doAnimation_;
 
     QTime timer_;

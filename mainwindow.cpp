@@ -237,6 +237,16 @@ void MainWindow::createMainMenu_()
     m->addAction(a);
     connect(a, SIGNAL(triggered()), editFrag_, SLOT(setFocus()));
 
+    // ------- textures ----------
+    m = new QMenu(tr("&Textures"), this);
+    menuBar()->addMenu(m);
+    for (int i=0; i<SCH_MAX_TEXTURES; ++i)
+    {
+        a = new QAction(tr("Select image &%1").arg(i), this);
+        m->addAction(a);
+        connect(a, &QAction::triggered, [=](){ slotSelectImage(i); });
+    }
+
     // --- options menu ---
     m = new QMenu(tr("&Options"), this);
     menuBar()->addMenu(m);
@@ -246,7 +256,7 @@ void MainWindow::createMainMenu_()
     m->addAction(createRenderOptionAction_("doDepthTest", "depth test"));
     m->addAction(createRenderOptionAction_("doCullFace", "cull faces"));
     m->addAction(createRenderOptionAction_("doFrontFaceCCW", "front is counter-clockwise"));
-    /*
+    /* XXX: NOT WORKING YET
     m->addSeparator();
     a = new QAction(tr("external opengl view"), this);
     a->setShortcut(Qt::Key_F2);
@@ -731,4 +741,23 @@ void MainWindow::slotAboutBox()
 void MainWindow::slotAboutQt()
 {
     QMessageBox::aboutQt(this);
+}
+
+void MainWindow::slotSelectImage(uint index)
+{
+    QString fn =
+        QFileDialog::getOpenFileName(this,
+            tr("Choose image file for slot %1").arg(index),
+            appSettings->getValue("image_path").toString(),
+            tr("Images (*.png *.xpm *.jpg *.bmp);"));
+
+    if (!fn.isEmpty())
+    {
+        // keep permanent link on image
+        appSettings->setValue(QString("image%1").arg(index), fn);
+        // tell renderwidget
+        renderer_->setImage(index, fn);
+        // store last directory
+        appSettings->setValue("image_path", QDir(fn).absolutePath());
+    }
 }
