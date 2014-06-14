@@ -1,3 +1,7 @@
+/*	Select your textures in the Textures menu.
+	The sampler2D uniform will create a widget with which you
+	can select a texture slot that will be bound to the sampler.
+*/
 #version 140
 // input from vertex shader
 in vec3 v_normal;
