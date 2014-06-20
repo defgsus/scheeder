@@ -37,8 +37,13 @@ public:
 
     ~SourceWidget();
 
+    /** Returns the last used filename from load or save, or an empty string */
     const QString& filename() const { return filename_; }
+
+    /** Returns true, if the text has been modified since last load/save. */
     bool modified() const { return modified_; }
+
+    /** Sets the modified flag */
     void setModified(bool modified) { modified_ = modified; }
 
 signals:
@@ -51,12 +56,18 @@ signals:
 
 protected:
 
+    /** Needed to catch Return key for auto-completer */
     void keyPressEvent(QKeyEvent *);
 
 
 public slots:
 
+    /** Loads the file's contents and sets the filename().
+        Returns success. */
     bool loadFile(const QString& filename);
+
+    /** Saves the contents to a text file and sets the filename().
+        Returns success. */
     bool saveFile(const QString& filename);
 
 private slots:

@@ -127,6 +127,7 @@ bool SourceWidget::saveFile(const QString &fn)
 
 void SourceWidget::keyPressEvent(QKeyEvent * e)
 {
+    // Let Enter accept the current auto-complete suggestion
     if ((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
         && completer_->popup()->isVisible()
         && !completer_->currentCompletion().isEmpty())
@@ -141,11 +142,11 @@ void SourceWidget::keyPressEvent(QKeyEvent * e)
 void SourceWidget::slotCursorChanged()
 {
     QTextCursor c = textCursor();
-
+    // send cursor pos to mainwindow
     statusMessage( QString("%1 : %2")
                    .arg(c.blockNumber() + 1)
                    .arg(c.columnNumber() + 1) );
-
+    // and hide the auto-completer
     if (completer_->popup()->isVisible())
         completer_->popup()->hide();
 }
@@ -154,10 +155,11 @@ void SourceWidget::slotTextChanged()
 {
     modified_ = true;
 
+    // get the word under cursor
     QTextCursor c = textCursor();
     c.select(QTextCursor::WordUnderCursor);
     QString word = c.selectedText();
-
+    // and test for auto-completion
     if (!word.isEmpty())
         performCompletion_(word);
 
@@ -172,6 +174,7 @@ void SourceWidget::slotInsertCompletion(const QString &word)
     int pos = c.position();
     c.insertText(word.right(numChars));
 
+    // select the inserted characters
     c.setPosition(pos);
     c.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
 
@@ -180,12 +183,13 @@ void SourceWidget::slotInsertCompletion(const QString &word)
 
 void SourceWidget::performCompletion_(const QString &word)
 {
-    // scan the strings
+    // scan the strings for matches
     completer_->setCompletionPrefix(word);
 
+    // if match
     if (completer_->completionCount() > 0)
     {
-        // break if the only word was fully written by user
+        // break if the only word was already fully written by user
         if (completer_->completionCount() == 1 &&
             completer_->currentCompletion() == word)
             return;
