@@ -28,7 +28,8 @@ SOURCES += \
     debug.cpp \
     glsl.cpp \
     glslhighlighter.cpp \
-    uniformwidgetfactory.cpp
+    uniformwidgetfactory.cpp \
+    glslsyntax.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -44,7 +45,8 @@ HEADERS  += \
     opengl.h \
     glslhighlighter.h \
     uniformwidgetfactory.h \
-    teapot_data.h
+    teapot_data.h \
+    glslsyntax.h
 
 FORMS    += \
     mainwindow.ui

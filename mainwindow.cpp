@@ -98,7 +98,7 @@ void MainWindow::createWidgets_()
 
     // vertex source
     editVert_ = new SourceWidget(this);
-    editVert_->setText(appSettings->getValue("vertex_source").toString());
+    editVert_->setPlainText(appSettings->getValue("vertex_source").toString());
     editVert_->setModified(false);
     connect(editVert_, SIGNAL(textChanged()), this, SLOT(slotUpdateSourceTitles()));
     connect(editVert_, SIGNAL(recompile()), this, SLOT(slotSourceChanged()));
@@ -109,7 +109,7 @@ void MainWindow::createWidgets_()
 
     // fragment source
     editFrag_ = new SourceWidget(this);
-    editFrag_->setText(appSettings->getValue("fragment_source").toString());
+    editFrag_->setPlainText(appSettings->getValue("fragment_source").toString());
     editFrag_->setModified(false);
     connect(editFrag_, SIGNAL(textChanged()), this, SLOT(slotUpdateSourceTitles()));
     connect(editFrag_, SIGNAL(recompile()), this, SLOT(slotSourceChanged()));
